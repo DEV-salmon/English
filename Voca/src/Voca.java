@@ -11,6 +11,10 @@ public class Voca {
         this.voca=makeVoca(fileName);
     }
 
+    public Vector<Word> getVoca() {
+        return voca;
+    }
+
     private Vector<Word> makeVoca(String fileName){
         Vector<Word> v = new Vector<>();
         try(Scanner sc = new Scanner(new File(fileName))){
@@ -74,12 +78,31 @@ public class Voca {
             1. 예문 추가
             2. 예문 삭제
             3. 예문 수정
-         */ 
+         */
 
+
+    /**
+     * 임시 메뉴입니다.
+     * 예문 추가기능 및 파일 저장/불러오기를 테스트 하기위한 메뉴 구성입니다.
+     */
     void menu(){
-        while(true){
-            int choice = scanner.nextInt();
-            
+        System.out.println("파일이 로드되었습니다.");
+        int choice = 0;
+
+        while(choice !=4) {
+            System.out.println("1) 단어검색 2) 단어검색2 3)예문 추가 4) 종료");
+            System.out.print("메뉴를 선택하세요 : ");
+            choice = scanner.nextInt();
+            scanner.nextLine();
+            System.out.println();
+            switch (choice) {
+                case 1-> BaseMenu.searchVoc(scanner,voca);
+                case 2-> BaseMenu.searchVoc2(scanner,voca);
+                case 3 -> ExampleManagement.ex_put(scanner,voca);
+                case 4 ->System.out.println("단어장 프로그램을 종료합니다.");
+            }
         }
+        FileManagement.save_Voca(voca,"Voca/src/res/voca");
     }
+
 }

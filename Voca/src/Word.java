@@ -17,10 +17,10 @@ public class Word {
     public String getEng() {
         return eng;
     }
-
     public String[] getKor() {
-        return kor;
+        return kor = new String[]{String.join(", ", kor)};
     }
+
     public void setEx(String ex) {
         this.ex = ex;
     }
@@ -31,4 +31,14 @@ public class Word {
         this.kor = kor;
     }
 
+
+    @Override
+    public String toString() {
+
+        String eng_kor_ex_String = eng + " : " + String.join(", ", kor) + "\n" + "예문 : "+ex;
+        String eng_kor_String = eng + " : " + String.join(", ", kor)+ " ";
+
+
+        return (ex != null && !ex.isEmpty()) ? eng_kor_ex_String : eng_kor_String;
+    }
 }
