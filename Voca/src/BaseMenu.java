@@ -2,8 +2,6 @@ import java.util.Scanner;
 import java.util.Vector;
 
 public class BaseMenu {
-    ExampleManagement eM = new ExampleManagement();
-    FileManagement fM = new FileManagement();
     public static void searchVoc2(Scanner scanner,Vector<Word> voca) {
         System.out.println("------ 단어 검색 2 ------");
         System.out.print("검색할 부분 단어를 입력하세요 (영단어) : ");

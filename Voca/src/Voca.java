@@ -11,10 +11,6 @@ public class Voca {
         this.voca=makeVoca(fileName);
     }
 
-    public Vector<Word> getVoca() {
-        return voca;
-    }
-
     private Vector<Word> makeVoca(String fileName){
         Vector<Word> v = new Vector<>();
         try(Scanner sc = new Scanner(new File(fileName))){

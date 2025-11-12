@@ -8,8 +8,8 @@ public class ExampleManagement {
      * 사용자로부터 예문을 적고싶은 단어를 for문을 통해 찾습니다.
      * 찾는 단어가 존재한다면 예문을 적습니다. set을 이용하여 적은 예문을 해당 Word객체에 저장합니다.
      * 찾는 단어가 존재하지 않는다면 존재하지 않는다는 안내와 함께 종료 됩니다.
-     * @param scanner
-     * @param voca
+     * @param scanner  : 많은 부분에 사용하여 간소화할 방법 고민
+     * @param voca : 생성된 Voca객체를 가지고 옵니다.
      */
     public static void ex_put(Scanner scanner, Vector<Word> voca){
         System.out.println("예문을 적으려는 단어를 적어주십시오");

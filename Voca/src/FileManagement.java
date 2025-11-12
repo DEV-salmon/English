@@ -7,11 +7,11 @@ public class FileManagement {
     public static void save_Voca(Vector<Word> voca,String filename) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(filename))) {
             for (Word word : voca) {
-                String engString = String.join("/ ", word.getKor());
+                String engString = word.getEng();
                 String korString = String.join("/ ", word.getKor());
                 String exString = (word.getEx() != null) ? word.getEx() : "";
 
-                String line = word.getEng() + "\t" + korString + "\t" + exString;
+                String line = engString + "\t" + korString + "\t" + exString;
                 writer.println(line);
             }
         } catch (IOException e) {
