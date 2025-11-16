@@ -3,11 +3,115 @@ import java.util.Vector;
 
 public class ExampleManagement {
 
+    public static void ex_menu(Scanner scanner, Vector<Word> voca){
+        int choice = 0;
+
+        while(choice !=4) {
+            System.out.println("1) 에문 추가 2) 예문 삭제 3) 예문 수정 4) 종료");
+            System.out.print("메뉴를 선택하세요 : ");
+            choice = scanner.nextInt();
+            scanner.nextLine();
+            System.out.println();
+            switch (choice) {
+                case 1-> {
+                    System.out.print("\u001B[H\u001B[2J");
+                    System.out.flush();
+                    ex_put(scanner,voca);
+                }
+                case 2-> ex_remove(scanner,voca);
+                case 3 ->ex_fix(scanner,voca);
+                case 4 ->System.out.println("예문 관리 메뉴를 종료합니다.");
+            }
+        }
+    }
+
+    /**
+     * 단어장의 에문을 수정하는 메소드입니다.
+     * @param scanner  : 많은 부분에 사용하여 간소화할 방법 고민
+     * @param voca : 생성된 Voca객체를 가지고 옵니다.
+     */
+    private static void ex_fix(Scanner scanner, Vector<Word> voca) {
+        System.out.println("예문을 수정하려는 단어를 적어주십시오");
+        System.out.print("단어 : ");
+        String vWord = scanner.next();
+        scanner.nextLine();
+
+        boolean isfound = false;
+
+        for (Word str : voca) {
+            if (str.getEng().equals(vWord)) {
+                if (str.getEx() == null) {
+                    System.out.println("에문이 존재하지 않습니다.\n");
+                    return;
+                }
+                System.out.println("찾은 단어 " + str.getEng());
+                System.out.println("예문 : " + str.getEx());
+                System.out.print("정말 수정하시겠습니까? (예 또는 아니오) : ");
+                String remove_choice = scanner.nextLine();
+                if (remove_choice.equals("예")) {
+                    System.out.print("수정할 예문을 적어 주십시오 : ");
+                    String vEx = scanner.nextLine();
+                    str.setEx(vEx);
+
+                    System.out.println("수정된 예문 : " + str.getEx());
+                    System.out.println();
+                } else if (remove_choice.equals("아니오")) {
+                    System.out.println("예문 수정 기능을 종료 합니다.");
+                    return;
+                }
+                isfound = true;
+                break;
+            }
+        }
+        if (!isfound) {
+            System.out.println("찾는 단어가 단어장에 존재하지 않습니다.");
+            System.out.println();
+        }
+    }
+
+    /**
+     * 단어장의 에문을 삭제하는 메소드입니다.
+     * @param scanner  : 많은 부분에 사용하여 간소화할 방법 고민
+     * @param voca : 생성된 Voca객체를 가지고 옵니다.
+     */
+    private static void ex_remove(Scanner scanner, Vector<Word> voca) {
+        System.out.println("예문을 삭제하려는 단어를 적어주십시오");
+        System.out.print("단어 : ");
+        String vWord = scanner.next();
+        scanner.nextLine();
+
+        boolean isfound = false;
+
+        for (Word str : voca) {
+            if (str.getEng().equals(vWord)) {
+                if(str.getEx() == null){
+                    System.out.println("에문이 존재하지 않습니다.\n");
+                    return;
+                }
+                System.out.println("찾은 단어 " + str.getEng());
+                System.out.println("예문 : " + str.getEx());
+                System.out.print("정말 삭제하시겠습니까? (예 또는 아니오) : ");
+                String remove_choice = scanner.nextLine();
+                if(remove_choice.equals("예")){
+                    str.setEx(null);
+                    System.out.println(str.getEng() + "의 예문을 삭제하였습니다.");
+                } else if (remove_choice.equals("아니오")) {
+                    System.out.println("예문 삭제 기능을 종료 합니다.");
+                    return;
+                }
+                isfound = true;
+                break;
+            }
+        }
+        if (!isfound) {
+            System.out.println("찾는 단어가 단어장에 존재하지 않습니다.");
+            System.out.println();
+        }
+    }
+
+
     /**
      * 단어장의 에문을 추가하는 메소드입니다.
-     * 사용자로부터 예문을 적고싶은 단어를 for문을 통해 찾습니다.
-     * 찾는 단어가 존재한다면 예문을 적습니다. set을 이용하여 적은 예문을 해당 Word객체에 저장합니다.
-     * 찾는 단어가 존재하지 않는다면 존재하지 않는다는 안내와 함께 종료 됩니다.
      * @param scanner  : 많은 부분에 사용하여 간소화할 방법 고민
      * @param voca : 생성된 Voca객체를 가지고 옵니다.
      */
@@ -18,15 +122,18 @@ public class ExampleManagement {
         scanner.nextLine();
 
         boolean isfound = false;
-
         for (Word str : voca) {
             if (str.getEng().equals(vWord)) {
-                System.out.println("찾은 단어 " + str);
+                if(str.getEx() != null){
+                    System.out.println("에문이 이미 존재합니다.\n");
+                    return;
+                }
+                System.out.println("찾은 단어 " + str.getEng());
                 System.out.print("예문을 적어 주십시오 : ");
                 String vEx = scanner.nextLine();
                 str.setEx(vEx);
 
-                System.out.println("예문 저장됨: " + str);
+                System.out.println(str);
                 System.out.println();
 
                 isfound = true;
