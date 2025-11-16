@@ -3,6 +3,7 @@ import java.util.Vector;
 import java.io.File;
 import java.io.FileNotFoundException;
 
+
 public class Voca {
     private Vector<Word> voca=new Vector<>();
     private Scanner scanner = new Scanner(System.in);
@@ -94,7 +95,9 @@ public class Voca {
             switch (choice) {
                 case 1-> BaseMenu.searchVoc(scanner,voca);
                 case 2-> BaseMenu.searchVoc2(scanner,voca);
-                case 3 -> ExampleManagement.ex_put(scanner,voca);
+                case 3 -> {
+                    ;
+                }
                 case 4 ->System.out.println("단어장 프로그램을 종료합니다.");
             }
         }

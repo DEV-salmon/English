@@ -1,0 +1,14 @@
+{
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "Voca/src/lib/cmu_time_awb.jar",
+        "Voca/src/lib/cmu_us_kal.jar",
+        "Voca/src/lib/cmudict04.jar",
+        "Voca/src/lib/cmulex.jar",
+        "Voca/src/lib/cmutimelex.jar",
+        "Voca/src/lib/en_us.jar",
+        "Voca/src/lib/freetts-jsapi10.jar",
+        "Voca/src/lib/freetts.jar",
+        "Voca/src/lib/mbrola.jar"
+    ]
+}
