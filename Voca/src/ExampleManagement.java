@@ -27,10 +27,14 @@ public class ExampleManagement {
 
     /**
      * 단어장의 에문을 수정하는 메소드입니다.
-     * @param scanner  : 많은 부분에 사용하여 간소화할 방법 고민
-     * @param voca : 생성된 Voca객체를 가지고 옵니다.
+     * @param scanner   많은 부분에 사용하여 간소화할 방법 고민
+     * @param voca  생성된 Voca객체를 가지고 옵니다.
      */
     private static void ex_fix(Scanner scanner, Vector<Word> voca) {
+        if(voca.isEmpty()){
+            System.out.println("단어장이 비어있습니다.");
+            return;
+        }
         System.out.println("예문을 수정하려는 단어를 적어주십시오");
         System.out.print("단어 : ");
         String vWord = scanner.next();
@@ -71,10 +75,14 @@ public class ExampleManagement {
 
     /**
      * 단어장의 에문을 삭제하는 메소드입니다.
-     * @param scanner  : 많은 부분에 사용하여 간소화할 방법 고민
-     * @param voca : 생성된 Voca객체를 가지고 옵니다.
+     * @param scanner   많은 부분에 사용하여 간소화할 방법 고민
+     * @param voca  생성된 Voca객체를 가지고 옵니다.
      */
     private static void ex_remove(Scanner scanner, Vector<Word> voca) {
+        if(voca.isEmpty()){
+            System.out.println("단어장이 비어있습니다.");
+            return;
+        }
         System.out.println("예문을 삭제하려는 단어를 적어주십시오");
         System.out.print("단어 : ");
         String vWord = scanner.next();
@@ -109,13 +117,16 @@ public class ExampleManagement {
         }
     }
 
-
     /**
      * 단어장의 에문을 추가하는 메소드입니다.
-     * @param scanner  : 많은 부분에 사용하여 간소화할 방법 고민
-     * @param voca : 생성된 Voca객체를 가지고 옵니다.
+     * @param scanner   많은 부분에 사용하여 간소화할 방법 고민
+     * @param voca  생성된 Voca객체를 가지고 옵니다.
      */
     public static void ex_put(Scanner scanner, Vector<Word> voca){
+        if(voca.isEmpty()){
+            System.out.println("단어장이 비어있습니다.");
+            return;
+        }
         System.out.println("예문을 적으려는 단어를 적어주십시오");
         System.out.print("단어 : ");
         String vWord = scanner.next();

@@ -2,8 +2,8 @@ import java.util.Scanner;
 import java.util.Vector;
 
 public class Voca {
-    private Vector<Word> voca;
-    private final Scanner scanner = new Scanner(System.in);
+    private static Vector<Word> voca;
+    private static final Scanner scanner = new Scanner(System.in);
 
     Voca(String fileName){
         this.voca=FileManagement.makeVoca(fileName);
@@ -36,37 +36,30 @@ public class Voca {
             3. 예문 수정
          */
 
-    public static void run(String FileName){
-        Voca voca = new Voca(FileName);
-        voca.menu();
+    public static void run(String loginfileName){
+        LogInManagement.run(loginfileName);
     }
 
-    /**
-     * 임시 메뉴입니다.
-     * 예문 추가기능 및 파일 저장/불러오기를 테스트 하기위한 메뉴 구성입니다.
-     */
-    void menu(){
-        System.out.println("파일이 로드되었습니다.");
+    static void menu(String fileName,String userId){
+        System.out.println(userId + "님의 단어장입니다.");
         int choice = 0;
 
         while(choice !=5) {
-            System.out.println("1) 단어검색 2) 단어검색2 3)예문 추가 4)단어장 출력 5) 종료");
+            System.out.println("3)예문 추가 4)단어장 출력 5) 종료");
             System.out.print("메뉴를 선택하세요 : ");
             choice = scanner.nextInt();
             scanner.nextLine();
             System.out.println();
             switch (choice) {
-                case 1-> BaseMenu.searchVoc(scanner,voca);
-                case 2-> BaseMenu.searchVoc2(scanner,voca);
                 case 3 -> ExampleManagement.ex_menu(scanner,voca);
                 case 4 -> all_print(voca);
-                case 5 ->System.out.println("단어장 프로그램을 종료합니다.");
+                case 5 ->System.out.println(userId + "님의 단어장을 종료합니다.\n");
             }
         }
-        FileManagement.saveVoca(voca,"Voca/src/res/voca");
+        FileManagement.saveVoca(voca,fileName);
     }
 
-    private void all_print(Vector<Word> voca) {
+    private static void all_print(Vector<Word> voca) {
         for(Word str : voca){
             System.out.println(str);
         }
