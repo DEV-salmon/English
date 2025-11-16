@@ -46,7 +46,6 @@ public class TTS {
         if (this.voice != null) {
             try {
                 this.voice.deallocate();
-                System.out.println("TTS 리소스를 해제했습니다.");
             } catch (Exception e) {
                 System.out.println("리소스 해제중 오류 발생");
             }

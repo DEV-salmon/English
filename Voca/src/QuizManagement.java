@@ -2,19 +2,33 @@
 import java.util.*;
 public class QuizManagement {
     static int hintCount = 0;
-
     public static void init(Vector<Word> words){
-        System.out.println("퀴즈 메뉴입니다");
-        System.out.println("1. 스펠링 퀴즈");
-        System.out.println("2. 한국어 뜻 퀴즈");
-        System.out.println("3. 예문 빈칸 퀴즈");
-        System.out.println("4. 뒤로가기");
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            System.out.println("퀴즈 메뉴입니다");
+            System.out.println("1. 뜻 -> 영어 퀴즈");
+            System.out.println("2. 영어 -> 퀴즈");
+            System.out.println("3. 예문 빈칸 퀴즈");
+            System.out.println("4. 스펠링 퀴즈");
+            System.out.println("5. 뒤로가기");
+            int menuNum = scanner.nextInt();
+            switch (menuNum) {
+                case 1 ->{
+                    korEngQuiz(words, scanner);
+                }
+                case 2 ->{
+                    engKorQuiz(words, scanner);
+                }
+                case 3 ->{
+                    
+                }
+            }
     }
-    public static void korEngQuiz(Vector<Word> words ){
+    }
+    public static void korEngQuiz(Vector<Word> words ,Scanner scanner){
         hintCount=0;
         int score = 0;
         System.out.print("원하시는 퀴즈 문항 수를 설정해주세요 : ");
-        Scanner scanner = new Scanner(System.in);
         int quizNumber=scanner.nextInt();
         List<Integer> list =pickN(words.size(),quizNumber);
         for(int i=0;i<list.size();i++){
@@ -25,7 +39,7 @@ public class QuizManagement {
         System.out.println("힌트 사용 횟수 : "+hintCount);
         System.out.println("점수 : "+ score);
     }
-    public static void engKorQuiz(Vector<Word> words){
+    public static void engKorQuiz(Vector<Word> words,Scanner scanner){
         hintCount=0;
 
 

@@ -25,7 +25,7 @@ public class Voca {
                 String line=sc.nextLine();
                 String[] engKorEx = line.split("\t");
                 eng = engKorEx[0].trim();
-                kor = engKorEx[1].split("/");
+                kor = engKorEx[1].split(",");
                 for (int i = 0; i < kor.length; i++) {
                     kor[i] = kor[i].trim();
                 }
@@ -96,7 +96,8 @@ public class Voca {
                 case 1-> BaseMenu.searchVoc(scanner,voca);
                 case 2-> BaseMenu.searchVoc2(scanner,voca);
                 case 3 -> {
-                    ;
+                    QuizManagement.init(voca);
+                    
                 }
                 case 4 ->System.out.println("단어장 프로그램을 종료합니다.");
             }
