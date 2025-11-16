@@ -6,7 +6,7 @@ public class Voca {
     private static final Scanner scanner = new Scanner(System.in);
 
     Voca(String fileName){
-        this.voca=FileManagement.makeVoca(fileName);
+        voca=FileManagement.makeVoca(fileName);
     }
 
         /*

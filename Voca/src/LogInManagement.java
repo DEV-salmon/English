@@ -133,7 +133,7 @@ public class LogInManagement {
      */
     public static void loginUser(Scanner scanner, Vector<Login> loginList) {
         if(loginList.isEmpty()){
-            System.out.println("회원가입이 된 아이디가 없습니다.");
+            System.out.println("회원가입이 된 아이디가 없습니다.\n");
             return;
         }
         try{
@@ -141,8 +141,6 @@ public class LogInManagement {
             System.out.print("아이디 : ");
             String pid = scanner.next();
             scanner.nextLine();
-            boolean isfound = false;
-
             for(Login login : loginList){
                 if (login.getUserid().equals(pid)) {
                     System.out.println("비밀번호를 입력하십시오.");
@@ -150,7 +148,6 @@ public class LogInManagement {
                     String ppw = scanner.next();
                     scanner.nextLine();
                     String hashedInput = PasswordUtil.hashPassword(ppw, login.getSalt());
-                    isfound = true;
                     if(login.getHashedpassword().equals(hashedInput)){
                         System.out.println("로그인이 완료되었습니다.\n");
                         String vocafile = "Voca/src/res/Vocas/"+login.getUserid()+"_voca";
@@ -163,9 +160,7 @@ public class LogInManagement {
                     }
                 }
             }
-            if(!isfound){
-                System.out.println("아이디가 존재하지 않습니다.\n");
-            }
+            System.out.println("아이디가 존재하지 않습니다.\n");
         } catch (NoSuchAlgorithmException e) {
             System.out.println("알고리즘을 찾을 수 없습니다.\n");
         }
