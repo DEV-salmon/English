@@ -53,7 +53,7 @@ public class Word {
         String eng_kor_String = eng + " : " + String.join(", ", kor)+ " ";
 
 
-        return (ex != null && !ex.isEmpty()) ? eng_kor_ex_String : eng_kor_String;
+        return ((ex != null && !ex.isEmpty()) ? eng_kor_ex_String : eng_kor_String) + "\n"+"-".repeat(20);
     }
 
     public boolean haveEx(){

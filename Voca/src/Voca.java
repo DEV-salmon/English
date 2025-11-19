@@ -1,53 +1,12 @@
 import java.util.Scanner;
 import java.util.Vector;
-import java.io.File;
-import java.io.FileNotFoundException;
-
 
 public class Voca {
-    private Vector<Word> voca=new Vector<>();
-    private Scanner scanner = new Scanner(System.in);
+    private static Vector<Word> voca;
+    private static final Scanner scanner = new Scanner(System.in);
 
     Voca(String fileName){
-        this.voca=makeVoca(fileName);
-    }
-
-    private Vector<Word> makeVoca(String fileName){
-        Vector<Word> v = new Vector<>();
-        try(Scanner sc = new Scanner(new File(fileName))){
-            int number = 0;
-
-            while(sc.hasNextLine()){
-                number++;
-                String eng;
-                String[] kor;
-                String ex="";
-                String line=sc.nextLine();
-                String[] engKorEx = line.split("\t");
-                eng = engKorEx[0].trim();
-                kor = engKorEx[1].split(",");
-                for (int i = 0; i < kor.length; i++) {
-                    kor[i] = kor[i].trim();
-                }
-                if(engKorEx.length==3){
-                    ex = engKorEx[2].trim();
-                    v.add(new Word(eng, kor, ex));
-                }
-                else if(engKorEx.length==2){
-                    v.add(new Word(eng, kor));
-                }
-                else{
-                    System.out.println(number+"의 단어의 형식이 잘못되었습니다. \n 형식 오류는 다른 단어에 영향을 끼칠 수 있으니 다시 한 번 확인해주세요.");
-                }
-            }
-        }
-        catch(FileNotFoundException e){
-            System.out.println("파일을 찾을 수 없습니다.");
-        }
-        if(v.isEmpty()){
-            System.out.println("보카가 비어있습니다 다시 한 번 확인해주세요");
-        }
-        return v;
+        voca=FileManagement.makeVoca(fileName);
     }
 
         /*
@@ -77,32 +36,33 @@ public class Voca {
             3. 예문 수정
          */
 
+    public static void run(String loginfileName){
+        LogInManagement.run(loginfileName);
+    }
 
-    /**
-     * 임시 메뉴입니다.
-     * 예문 추가기능 및 파일 저장/불러오기를 테스트 하기위한 메뉴 구성입니다.
-     */
-    void menu(){
-        System.out.println("파일이 로드되었습니다.");
+    static void menu(String fileName,String userId){
+        System.out.println(userId + "님의 단어장입니다.");
         int choice = 0;
 
-        while(choice !=4) {
-            System.out.println("1) 단어검색 2) 단어검색2 3)퀴즈 4) 종료");
+        while(choice !=5) {
+            System.out.println("3)예문 추가 4)단어장 출력 5) 종료");
             System.out.print("메뉴를 선택하세요 : ");
             choice = scanner.nextInt();
             scanner.nextLine();
             System.out.println();
             switch (choice) {
-                case 1-> BaseMenu.searchVoc(scanner,voca);
-                case 2-> BaseMenu.searchVoc2(scanner,voca);
-                case 3 -> {
-                    QuizManagement.menu(voca);
-                    
-                }
-                case 4 ->System.out.println("단어장 프로그램을 종료합니다.");
+                case 3 -> ExampleManagement.ex_menu(scanner,voca);
+                case 4 -> all_print(voca);
+                case 5 ->System.out.println(userId + "님의 단어장을 종료합니다.\n");
             }
         }
-        FileManagement.save_Voca(voca,"Voca/src/res/voca");
+        FileManagement.saveVoca(voca,fileName);
+    }
+
+    private static void all_print(Vector<Word> voca) {
+        for(Word str : voca){
+            System.out.println(str);
+        }
     }
 
 }
