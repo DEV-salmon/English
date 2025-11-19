@@ -1,5 +1,9 @@
+package voca.management;
+
 import java.util.Scanner;
 import java.util.Vector;
+
+import voca.core.Word;
 
 public class ExampleManagement {
 

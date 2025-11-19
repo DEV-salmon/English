@@ -1,3 +1,7 @@
+package voca.core;
+
+import voca.tts.TTS;
+
 public class Word {
     private String eng;
     private String[] kor;
@@ -21,7 +25,10 @@ public class Word {
         return eng;
     }
     public String[] getKor() {
-        return kor = new String[]{String.join(", ", kor)};
+        if(kor == null){
+            return new String[0];
+        }
+        return kor.clone();
     }
 
     public void setEx(String ex) {

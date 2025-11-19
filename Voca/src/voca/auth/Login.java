@@ -1,3 +1,5 @@
+package voca.auth;
+
 import java.util.Objects;
 
 public class Login {

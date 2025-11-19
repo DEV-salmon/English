@@ -1,9 +1,16 @@
+package voca.auth;
+
 import java.io.File;
-import java.security.NoSuchAlgorithmException;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Scanner;
 import java.util.Vector;
+
+import voca.app.Voca;
+import voca.core.UserSession;
+import voca.core.Word;
+import voca.management.FileManagement;
 
 public class LogInManagement {
     private final Vector<Login> loginList;
@@ -32,7 +39,6 @@ public class LogInManagement {
             System.out.println("1) 회원가입 2) 로그인 3) 종료");
             System.out.print("메뉴를 선택하세요 : ");
             choice = scanner.nextInt();
-            
             scanner.nextLine();
             System.out.println();
             switch (choice) {

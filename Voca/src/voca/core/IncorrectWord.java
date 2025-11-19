@@ -1,3 +1,5 @@
+package voca.core;
+
 public class IncorrectWord extends Word {
     private String quizType;
 

@@ -1,14 +1,29 @@
+package voca.management;
 
 import java.util.*;
+
+import voca.core.IncorrectWord;
+import voca.core.UserSession;
+import voca.core.Word;
+
 public class QuizManagement {
     private static final String QUIZ_TYPE_KOR_ENG = "KOR_ENG";
     private static final String QUIZ_TYPE_ENG_KOR = "ENG_KOR";
     private static final String QUIZ_TYPE_EXAMPLE = "EXAMPLE";
     private static final String QUIZ_TYPE_SPELLING = "SPELLING";
-    static int hintCount = 0;
-    public static void menu(Vector<Word> words){
+    private final Vector<Word> words;
+    private final IncorrectManagement incorrectManagement;
+    private final Scanner scanner = new Scanner(System.in);
+    private static int hintCount = 0;
+
+    public QuizManagement(Vector<Word> words, UserSession session){
+        this.words = words;
+        this.incorrectManagement = new IncorrectManagement(session);
+    }
+
+    public void menu(){
+        incorrectManagement.initializeIncorrectNotes();
         cleanConsole();
-        Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.println("================================");
             System.out.println("퀴즈 메뉴");
@@ -26,19 +41,19 @@ public class QuizManagement {
             int menuNum = scanner.nextInt();
             switch (menuNum) {
                 case 1 ->{
-                    korEngQuiz(words, scanner);
+                    korEngQuiz();
                 }
                 case 2 ->{
-                    engKorQuiz(words, scanner);
+                    engKorQuiz();
                 }
                 case 3 ->{
-                    exampleQuiz(words, scanner);
+                    exampleQuiz();
                 }
                 case 4 ->{
-                    spellingQuiz(words, scanner);
+                    spellingQuiz();
                 }
                 case 5 ->{
-                    IncorrectManagement.menu(scanner);
+                    incorrectManagement.menu(scanner, this);
                 }
                 case 6 ->{
                     System.out.println("\u001B[2J");
@@ -51,81 +66,84 @@ public class QuizManagement {
     }
 
     
-    public static void korEngQuiz(Vector<Word> words ,Scanner scanner){
+    public void korEngQuiz(){
         hintCount=0;
         int score = 0;
         System.out.println("[뜻 -> 영어 퀴즈]");
         System.out.println("정답 또는 /hint를 입력하고 엔터를 눌러주세요.");
         System.out.println("불필요한 공백은 무시됩니다.");
-        System.out.print("원하시는 퀴즈 문항 수를 입력해주세요 : ");
-        int quizNumber=scanner.nextInt();
-        scanner.nextLine();
+        int quizNumber = requestQuizCount(words.size());
+        if(quizNumber <= 0){
+            return;
+        }
         List<Integer> list =pickN(words.size(),quizNumber);
         for(int i=0;i<list.size();i++){
             Word word = words.get(list.get(i));
-            if(subKorEngQuiz(i, word, scanner)){
+            if(subKorEngQuiz(i, word)){
                 score++;
             }
             else{
-                IncorrectManagement.recordIncorrect(word, QUIZ_TYPE_KOR_ENG);
+                incorrectManagement.recordIncorrect(word, QUIZ_TYPE_KOR_ENG);
             }
         }
         System.out.println("힌트 사용 횟수 : "+hintCount);
         System.out.println("점수 : "+ score);
         System.out.print(" 틀린 문항은 오답 노트에 기록됩니다 엔터를 눌러주세요...");
-        String next = scanner.nextLine();
+        scanner.nextLine();
     }
-    public static void engKorQuiz(Vector<Word> words,Scanner scanner){
+    public void engKorQuiz(){
         hintCount=0;
         int score = 0;
         System.out.println("[영어 -> 뜻 퀴즈]");
         System.out.println("정답 또는 /hint를 입력하고 엔터를 눌러주세요.");
         System.out.println("불필요한 공백은 무시됩니다.");
-        System.out.print("원하시는 퀴즈 문항 수를 입력해주세요 : ");
-        int quizNumber=scanner.nextInt();
-        scanner.nextLine();
+        int quizNumber = requestQuizCount(words.size());
+        if(quizNumber <= 0){
+            return;
+        }
         List<Integer> list =pickN(words.size(),quizNumber);
         for(int i=0;i<list.size();i++){
             Word word = words.get(list.get(i));
-            if(subEngKorQuiz(i, word, scanner)){
+            if(subEngKorQuiz(i, word)){
                 score++;
             }
             else{
-                IncorrectManagement.recordIncorrect(word, QUIZ_TYPE_ENG_KOR);
+                incorrectManagement.recordIncorrect(word, QUIZ_TYPE_ENG_KOR);
             }
         }
         System.out.println("힌트 사용 횟수 : "+hintCount);
         System.out.println("점수 : "+ score);
         System.out.print(" 틀린 문항은 오답 노트에 기록됩니다 엔터를 눌러주세요...");
-        String next = scanner.nextLine();
+        scanner.nextLine();
     }
 
-    public static void spellingQuiz(Vector<Word> words ,Scanner scanner){
+    public void spellingQuiz(){
         hintCount=0;
         int score = 0;
         System.out.println("[스펠링 퀴즈]");
         System.out.println("정답 또는 /hint, /speak 를 입력해주세요.");
         System.out.println("단어가 들린 뒤에 차분히 입력하면 됩니다.");
-        System.out.print("원하시는 퀴즈 문항 수를 입력해주세요 : ");
-        int quizNumber=scanner.nextInt();
-        scanner.nextLine();
+        int quizNumber = requestQuizCount(words.size());
+        if(quizNumber <= 0){
+            return;
+        }
         List<Integer> list =pickN(words.size(),quizNumber);
         for(int i=0;i<list.size();i++){
             Word word = words.get(list.get(i));
-            if(subSpellingQuiz(i, word, scanner)){
+            if(subSpellingQuiz(i, word)){
                 score++;
             }
             else{
-                IncorrectManagement.recordIncorrect(word, QUIZ_TYPE_SPELLING);
+                incorrectManagement.recordIncorrect(word, QUIZ_TYPE_SPELLING);
             }
         }
         System.out.println("힌트 사용 횟수 : "+hintCount);
         System.out.println("점수 : "+ score);
         System.out.print(" 틀린 문항은 오답 노트에 기록됩니다 엔터를 눌러주세요...");
-        String next = scanner.nextLine();
+        scanner.nextLine();
     }
 
-    public static void exampleQuiz(Vector<Word> words ,Scanner scanner){
+    public void exampleQuiz(){
         List<Integer> exampleIndices = new ArrayList<>();
         for(int i=0;i<words.size();i++){
             String example = words.get(i).getEx();
@@ -159,20 +177,20 @@ public class QuizManagement {
         Collections.shuffle(exampleIndices);
         for(int i=0;i<quizNumber;i++){
             Word word = words.get(exampleIndices.get(i));
-            if(subExampleQuiz(i, word, scanner)){
+            if(subExampleQuiz(i, word)){
                 score++;
             }
             else{
-                IncorrectManagement.recordIncorrect(word, QUIZ_TYPE_EXAMPLE);
+                incorrectManagement.recordIncorrect(word, QUIZ_TYPE_EXAMPLE);
             }
         }
         System.out.println("힌트 사용 횟수 : "+hintCount);
         System.out.println("점수 : "+ score);
         System.out.print(" 틀린 문항은 오답 노트에 기록됩니다 엔터를 눌러주세요...");
-        String next = scanner.nextLine();
+        scanner.nextLine();
     }
 
-    public static void runIncorrectQuiz(Vector<IncorrectWord> incorrectWords, Scanner scanner){
+    public void runIncorrectQuiz(Vector<IncorrectWord> incorrectWords){
         if(incorrectWords == null || incorrectWords.isEmpty()){
             System.out.println("기록된 오답이 없습니다.");
             System.out.print("엔터를 누르면 이전 메뉴로 돌아갑니다...");
@@ -189,12 +207,13 @@ public class QuizManagement {
             if(quizType == null || quizType.isEmpty()){
                 quizType = QUIZ_TYPE_ENG_KOR;
             }
-            boolean correct = askIncorrectQuestion(quizType, i, word, scanner);
+            boolean correct = askIncorrectQuestion(quizType, i, word);
             if(correct){
                 score++;
+                incorrectManagement.markCorrect(word);
             }
             else{
-                IncorrectManagement.recordIncorrect(word, quizType);
+                incorrectManagement.recordIncorrect(word, quizType);
             }
         }
         System.out.println("힌트 사용 횟수 : "+hintCount);
@@ -203,30 +222,58 @@ public class QuizManagement {
         scanner.nextLine();
     }
 
-    private static boolean askIncorrectQuestion(String quizType, int number, Word word, Scanner scanner){
+    private boolean askIncorrectQuestion(String quizType, int number, Word word){
         String type = quizType != null && !quizType.isEmpty() ? quizType : QUIZ_TYPE_ENG_KOR;
         switch (type){
             case QUIZ_TYPE_KOR_ENG -> {
-                return subKorEngQuiz(number, word, scanner);
+                return subKorEngQuiz(number, word);
             }
             case QUIZ_TYPE_EXAMPLE -> {
                 if(word.getEx() == null || word.getEx().trim().isEmpty()){
                     System.out.println("예문 정보가 없어 해당 문제를 건너뜁니다.");
                     return true;
                 }
-                return subExampleQuiz(number, word, scanner);
+                return subExampleQuiz(number, word);
             }
             case QUIZ_TYPE_SPELLING -> {
-                return subSpellingQuiz(number, word, scanner);
+                return subSpellingQuiz(number, word);
             }
             case QUIZ_TYPE_ENG_KOR -> {
-                return subEngKorQuiz(number, word, scanner);
+                return subEngKorQuiz(number, word);
             }
             default -> {
-                return subEngKorQuiz(number, word, scanner);
+                return subEngKorQuiz(number, word);
             }
         }
     }
+    private int requestQuizCount(int available){
+        if(available <= 0){
+            System.out.println("등록된 단어가 없어 퀴즈를 진행할 수 없습니다.");
+            System.out.print("엔터를 누르면 이전 메뉴로 돌아갑니다...");
+            scanner.nextLine();
+            return 0;
+        }
+        while(true){
+            System.out.print("원하시는 퀴즈 문항 수를 입력해주세요 : ");
+            if(!scanner.hasNextInt()){
+                System.out.println("숫자를 입력해주세요.");
+                scanner.nextLine();
+                continue;
+            }
+            int quizNumber = scanner.nextInt();
+            scanner.nextLine();
+            if(quizNumber <= 0){
+                System.out.println("1 이상의 문항 수를 입력해주세요.");
+                continue;
+            }
+            if(quizNumber > available){
+                System.out.println("등록된 단어가 "+available+"개라 해당 개수만큼만 진행합니다.");
+                return available;
+            }
+            return quizNumber;
+        }
+    }
+
     private static List<Integer> pickN(int len, int number) {
         List<Integer> list = new ArrayList<>();
         for (int i = 0; i < len; i++) {
@@ -234,10 +281,16 @@ public class QuizManagement {
         }
 
         Collections.shuffle(list);
-        return list.subList(0, number);
+        if(number < 0){
+            number = 0;
+        }
+        if(number > len){
+            number = len;
+        }
+        return new ArrayList<>(list.subList(0, number));
     }
 
-    private static boolean subSpellingQuiz(int number, Word word, Scanner scanner){
+    private boolean subSpellingQuiz(int number, Word word){
         System.out.println();
         System.out.println((number+1)+"번 문제 ");
         String english = word.getEng();
@@ -278,7 +331,7 @@ public class QuizManagement {
         }
     }
 
-    private static boolean subExampleQuiz(int number, Word word, Scanner scanner){
+    private boolean subExampleQuiz(int number, Word word){
         System.out.println();
         System.out.println((number+1)+"번 문제 ");
         String example = word.getEx();
@@ -331,7 +384,7 @@ public class QuizManagement {
 
 
 
-    private static boolean subEngKorQuiz(int number, Word word, Scanner scanner){
+    private boolean subEngKorQuiz(int number, Word word){
         System.out.println();
         System.out.println((number+1)+"번 문제 ");
         String english = word.getEng();
@@ -387,7 +440,7 @@ public class QuizManagement {
         }
     }
 
-    private static boolean subKorEngQuiz(int number, Word word, Scanner scanner){
+    private boolean subKorEngQuiz(int number, Word word){
         System.out.println();
         System.out.println((number+1)+"번 문제 ");
         String[] korean = word.getKor();

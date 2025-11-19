@@ -1,6 +1,11 @@
+package voca.management;
+
 import java.io.*; // 파일 입출력 관련 클래스 import
 import java.util.Scanner;
 import java.util.Vector;
+
+import voca.auth.Login;
+import voca.core.Word;
 
 public class FileManagement {
 
@@ -60,14 +65,18 @@ public class FileManagement {
         try(Scanner sc = new Scanner(new File(fileName))){
 
             while(sc.hasNextLine()){
-                String userid;
-                String salt;
-                String hspw;
-                String line=sc.nextLine();
+                String line=sc.nextLine().trim();
+                if(line.isEmpty()){
+                    continue;
+                }
                 String[] idsalthspw = line.split("\t");
-                userid = idsalthspw[0].trim();
-                salt = idsalthspw[1].trim();
-                hspw = idsalthspw[2].trim();
+                if(idsalthspw.length < 3){
+                    System.out.println("로그인 정보 형식이 잘못된 줄을 건너뜁니다 : " + line);
+                    continue;
+                }
+                String userid = idsalthspw[0].trim();
+                String salt = idsalthspw[1].trim();
+                String hspw = idsalthspw[2].trim();
                 l.add(new Login(userid, salt, hspw));
             }
         }
