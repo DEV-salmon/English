@@ -50,7 +50,7 @@ public class QuizManagement {
         }
     }
 
-
+    
     public static void korEngQuiz(Vector<Word> words ,Scanner scanner){
         hintCount=0;
         int score = 0;
