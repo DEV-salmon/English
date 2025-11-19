@@ -87,7 +87,7 @@ public class Voca {
         int choice = 0;
 
         while(choice !=4) {
-            System.out.println("1) 단어검색 2) 단어검색2 3)예문 추가 4) 종료");
+            System.out.println("1) 단어검색 2) 단어검색2 3)퀴즈 4) 종료");
             System.out.print("메뉴를 선택하세요 : ");
             choice = scanner.nextInt();
             scanner.nextLine();
@@ -96,7 +96,7 @@ public class Voca {
                 case 1-> BaseMenu.searchVoc(scanner,voca);
                 case 2-> BaseMenu.searchVoc2(scanner,voca);
                 case 3 -> {
-                    QuizManagement.init(voca);
+                    QuizManagement.menu(voca);
                     
                 }
                 case 4 ->System.out.println("단어장 프로그램을 종료합니다.");

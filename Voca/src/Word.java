@@ -1,7 +1,7 @@
 public class Word {
     private String eng;
     private String[] kor;
-    private String ex;
+    private String ex="";
 
     public Word(String eng, String[] kor){
         this.eng = eng;
@@ -12,6 +12,9 @@ public class Word {
         this.ex = ex;
     }
     public String getEx() {
+        if (ex.equals("")){
+            return null;
+        }
         return ex;
     }
     public String getEng() {
@@ -51,5 +54,12 @@ public class Word {
 
 
         return (ex != null && !ex.isEmpty()) ? eng_kor_ex_String : eng_kor_String;
+    }
+
+    public boolean haveEx(){
+        if (getEx()==null){
+            return false;
+        }
+        return true;
     }
 }

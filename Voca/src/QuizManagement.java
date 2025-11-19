@@ -1,9 +1,13 @@
 
 import java.util.*;
 public class QuizManagement {
+    private static final String QUIZ_TYPE_KOR_ENG = "KOR_ENG";
+    private static final String QUIZ_TYPE_ENG_KOR = "ENG_KOR";
+    private static final String QUIZ_TYPE_EXAMPLE = "EXAMPLE";
+    private static final String QUIZ_TYPE_SPELLING = "SPELLING";
     static int hintCount = 0;
     public static void menu(Vector<Word> words){
-        System.out.println("\u001B[2J");
+        cleanConsole();
         Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.println("================================");
@@ -16,7 +20,7 @@ public class QuizManagement {
             System.out.println("2. 영어 -> 뜻 퀴즈");
             System.out.println("3. 예문 빈칸 퀴즈");
             System.out.println("4. 스펠링 퀴즈");
-            System.out.println("5. 오답노트 출력");
+            System.out.println("5. 오답 메뉴");
             System.out.println("6. 뒤로가기");
             System.out.print("원하시는 항목 번호를 입력해주세요 -> ");
             int menuNum = scanner.nextInt();
@@ -34,7 +38,7 @@ public class QuizManagement {
                     spellingQuiz(words, scanner);
                 }
                 case 5 ->{
-
+                    IncorrectManagement.menu(scanner);
                 }
                 case 6 ->{
                     System.out.println("\u001B[2J");
@@ -42,7 +46,7 @@ public class QuizManagement {
                 }
                 default -> System.out.println("다시 입력해주세요");
             }
-            System.out.println("\u001B[2J");
+            cleanConsole();
         }
     }
 
@@ -58,8 +62,12 @@ public class QuizManagement {
         scanner.nextLine();
         List<Integer> list =pickN(words.size(),quizNumber);
         for(int i=0;i<list.size();i++){
-            if(subKorEngQuiz(i, words.get(list.get(i)), scanner)){
+            Word word = words.get(list.get(i));
+            if(subKorEngQuiz(i, word, scanner)){
                 score++;
+            }
+            else{
+                IncorrectManagement.recordIncorrect(word, QUIZ_TYPE_KOR_ENG);
             }
         }
         System.out.println("힌트 사용 횟수 : "+hintCount);
@@ -78,8 +86,12 @@ public class QuizManagement {
         scanner.nextLine();
         List<Integer> list =pickN(words.size(),quizNumber);
         for(int i=0;i<list.size();i++){
-            if(subEngKorQuiz(i, words.get(list.get(i)), scanner)){
+            Word word = words.get(list.get(i));
+            if(subEngKorQuiz(i, word, scanner)){
                 score++;
+            }
+            else{
+                IncorrectManagement.recordIncorrect(word, QUIZ_TYPE_ENG_KOR);
             }
         }
         System.out.println("힌트 사용 횟수 : "+hintCount);
@@ -99,8 +111,12 @@ public class QuizManagement {
         scanner.nextLine();
         List<Integer> list =pickN(words.size(),quizNumber);
         for(int i=0;i<list.size();i++){
-            if(subSpellingQuiz(i, words.get(list.get(i)), scanner)){
+            Word word = words.get(list.get(i));
+            if(subSpellingQuiz(i, word, scanner)){
                 score++;
+            }
+            else{
+                IncorrectManagement.recordIncorrect(word, QUIZ_TYPE_SPELLING);
             }
         }
         System.out.println("힌트 사용 횟수 : "+hintCount);
@@ -142,14 +158,74 @@ public class QuizManagement {
         }
         Collections.shuffle(exampleIndices);
         for(int i=0;i<quizNumber;i++){
-            if(subExampleQuiz(i, words.get(exampleIndices.get(i)), scanner)){
+            Word word = words.get(exampleIndices.get(i));
+            if(subExampleQuiz(i, word, scanner)){
                 score++;
+            }
+            else{
+                IncorrectManagement.recordIncorrect(word, QUIZ_TYPE_EXAMPLE);
             }
         }
         System.out.println("힌트 사용 횟수 : "+hintCount);
         System.out.println("점수 : "+ score);
         System.out.print(" 틀린 문항은 오답 노트에 기록됩니다 엔터를 눌러주세요...");
         String next = scanner.nextLine();
+    }
+
+    public static void runIncorrectQuiz(Vector<IncorrectWord> incorrectWords, Scanner scanner){
+        if(incorrectWords == null || incorrectWords.isEmpty()){
+            System.out.println("기록된 오답이 없습니다.");
+            System.out.print("엔터를 누르면 이전 메뉴로 돌아갑니다...");
+            scanner.nextLine();
+            return;
+        }
+        hintCount=0;
+        int score = 0;
+        System.out.println("[오답 퀴즈]");
+        System.out.println("기록된 유형별로 다시 푸는 퀴즈입니다.");
+        for(int i=0;i<incorrectWords.size();i++){
+            IncorrectWord word = incorrectWords.get(i);
+            String quizType = word.getQuizType();
+            if(quizType == null || quizType.isEmpty()){
+                quizType = QUIZ_TYPE_ENG_KOR;
+            }
+            boolean correct = askIncorrectQuestion(quizType, i, word, scanner);
+            if(correct){
+                score++;
+            }
+            else{
+                IncorrectManagement.recordIncorrect(word, quizType);
+            }
+        }
+        System.out.println("힌트 사용 횟수 : "+hintCount);
+        System.out.println("점수 : "+ score);
+        System.out.print("엔터를 누르면 오답 메뉴로 돌아갑니다...");
+        scanner.nextLine();
+    }
+
+    private static boolean askIncorrectQuestion(String quizType, int number, Word word, Scanner scanner){
+        String type = quizType != null && !quizType.isEmpty() ? quizType : QUIZ_TYPE_ENG_KOR;
+        switch (type){
+            case QUIZ_TYPE_KOR_ENG -> {
+                return subKorEngQuiz(number, word, scanner);
+            }
+            case QUIZ_TYPE_EXAMPLE -> {
+                if(word.getEx() == null || word.getEx().trim().isEmpty()){
+                    System.out.println("예문 정보가 없어 해당 문제를 건너뜁니다.");
+                    return true;
+                }
+                return subExampleQuiz(number, word, scanner);
+            }
+            case QUIZ_TYPE_SPELLING -> {
+                return subSpellingQuiz(number, word, scanner);
+            }
+            case QUIZ_TYPE_ENG_KOR -> {
+                return subEngKorQuiz(number, word, scanner);
+            }
+            default -> {
+                return subEngKorQuiz(number, word, scanner);
+            }
+        }
     }
     private static List<Integer> pickN(int len, int number) {
         List<Integer> list = new ArrayList<>();
@@ -194,8 +270,8 @@ public class QuizManagement {
                 continue;
             }
 
-            String normalized = answer.replaceAll("\\s+","").toLowerCase();
-            if(normalized.equals(english.replaceAll("\\s+","").toLowerCase())){
+            String normalized = normalize(answer);
+            if(normalized.equals(normalize(english))){
                 return true;
             }
             return false;
@@ -242,8 +318,8 @@ public class QuizManagement {
                 continue;
             }
 
-            String normalized = answer.replaceAll("\\s+","").toLowerCase();
-            if(normalized.equals(english.replaceAll("\\s+","").toLowerCase())){
+            String normalized = normalize(answer);
+            if(normalized.equals(normalize(english))){
                 return true;
             }
             return false;
@@ -300,9 +376,9 @@ public class QuizManagement {
                 }
             }
             else{
-                String normalized = answer.replaceAll("\\s+","");
+                String normalized = normalize(answer);
                 for(String candidate : candidateList){
-                    if(normalized.equalsIgnoreCase(candidate.replaceAll("\\s+",""))){
+                    if(normalized.equals(normalize(candidate))){
                         return true;
                     }
                 }
@@ -362,12 +438,12 @@ public class QuizManagement {
                 continue;
             }
 
-            String normalized = answer.replaceAll("\\s+","").toLowerCase();
-            if(normalized.equals(english.replaceAll("\\s+","").toLowerCase())){
+            String normalized = normalize(answer);
+            if(normalized.equals(normalize(english))){
                 return true;
             }
             for(String meaning : meaningList){
-                if(normalized.equals(meaning.replaceAll("\\s+","").toLowerCase())){
+                if(normalized.equals(normalize(meaning))){
                     return true;
                 }
             }
@@ -385,6 +461,20 @@ public class QuizManagement {
 
     private static boolean isSpeak(String str){
         return str.equals("/speak");
+    }
+
+    private static String normalize(String input){
+        if(input == null){
+            return "";
+        }
+        String normalized = "";
+        for(int i=0;i<input.length();i++){
+            char ch = input.charAt(i);
+            if(!Character.isWhitespace(ch)){
+                normalized += Character.toLowerCase(ch);
+            }
+        }
+        return normalized;
     }
 
     private static String hideAnswerInExample(String example, String english){
@@ -427,5 +517,8 @@ public class QuizManagement {
             blank += "_";
         }
         return blank;
+    }
+    private static void cleanConsole(){
+        System.out.println("\u001B[2J");
     }
 }
