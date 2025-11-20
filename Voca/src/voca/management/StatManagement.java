@@ -47,6 +47,28 @@ public class StatManagement extends BaseMenu {
     public void addSpellingCorrect() { spelling_correct++; }
     public void addSpellingWrong() { spelling_wrong++; }
 
+    public void menu(Scanner scanner){
+        int choice = 0;
+        while(choice !=3){
+            cleanConsole();
+            System.out.println("1) 현재 통계 보기 2) 통계 파일 저장 3) 종료");
+            choice = readInt(scanner, "메뉴를 선택하세요 : ");
+            System.out.println();
+            switch (choice){
+                case 1 -> {
+                    printCurrentStats();
+                    waitConsole(scanner);
+                }
+                case 2 -> saveStatToFileWithWait(scanner);
+                case 3 -> {
+                    System.out.println("통계 메뉴를 종료합니다.");
+                    waitConsole(scanner);
+                }
+                default -> System.out.println("메뉴에 존재하지 않습니다. 다시 입력해주세요.");
+            }
+        }
+    }
+
     private double mean(int c, int w) {
         if (c + w == 0) return 0.0;
         return (double) c / (c + w);
@@ -104,6 +126,26 @@ public class StatManagement extends BaseMenu {
         }
 
         saveNormalDistributionChart();
+    }
+
+    private void printCurrentStats(){
+        System.out.println("===== 현재 통계 =====");
+        printBlock("[뜻 → 영어]", korEng_correct, korEng_wrong);
+        printBlock("[영어 → 뜻]", engKor_correct, engKor_wrong);
+        printBlock("[예문 빈칸]", example_correct, example_wrong);
+        printBlock("[스펠링]", spelling_correct, spelling_wrong);
+    }
+
+    private void printBlock(String title, int c, int w){
+        System.out.println(title);
+        int total = c + w;
+        System.out.println("총 문제 수    : " + total);
+        System.out.println("맞은 문제 수  : " + c);
+        System.out.println("틀린 문제 수  : " + w);
+        System.out.println("평균(정답률)  : " + String.format("%.4f", mean(c, w)));
+        System.out.println("분산          : " + String.format("%.4f", variance(c, w)));
+        System.out.println("표준편차      : " + String.format("%.4f", Math.sqrt(variance(c, w))));
+        System.out.println("------------------");
     }
 
     private void writeBlock(FileWriter fw, int c, int w) throws IOException {

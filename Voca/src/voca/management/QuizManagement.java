@@ -23,14 +23,25 @@ public class QuizManagement extends BaseMenu {
     private static final Scanner scanner = new Scanner(System.in);
     private static int hintCount = 0;
 
+    /**
+     * 생성자
+     * @param words : 유저의 보카 파일을 받는다
+     * @param session: 로그인한 유저의 보카 파일 경로를 전달하기 위해 필요하다
+     */
     public QuizManagement(Vector<Word> words, UserSession session){
         this.words = words;
         this.incorrectManagement = new IncorrectManagement(session);
         this.statManagement = new StatManagement(session);
     }
 
+    public StatManagement getStatManagement(){
+        return statManagement;
+    }
+
     /**
-     * 퀴즈 메뉴를 보여주고 선택에 따라 각 퀴즈/오답 메뉴로 이동합니다.
+     * 퀴즈 메인 메뉴를 보여주고, 사용자가 고른 번호에 따라 세부 퀴즈나 오답 메뉴로 보냅니다.
+     * 반복문에서 계속 묻다가 6번을 누르면 빠져나옵니다.
+     * 모드 선택은 여기서 처리하고, 실제 퀴즈 로직은 각 함수로 넘깁니다.
      */
     public void menu(){
         incorrectManagement.initializeIncorrectNotes();
@@ -53,16 +64,20 @@ public class QuizManagement extends BaseMenu {
                 case 1 ->{
                     int mode = modeSelect();
                     if(mode == MODE_OBJECTIVE){
-                        System.out.println("객관식 뜻 -> 영어 퀴즈는 아직 준비 중입니다. 주관식으로 진행합니다.");
+                        OBJkorEngQuiz();
                     }
-                    SUBkorEngQuiz();
+                    else{
+                        SUBkorEngQuiz();
+                    }
                 }
                 case 2 ->{
                     int mode = modeSelect();
                     if(mode == MODE_OBJECTIVE){
-                        System.out.println("객관식 영어 -> 뜻 퀴즈는 아직 준비 중입니다. 주관식으로 진행합니다.");
+                        OBJengKorQuiz();
                     }
-                    SUBengKorQuiz();
+                    else{
+                        SUBengKorQuiz();
+                    }
                 }
                 case 3 ->{
                     int mode = modeSelect();
@@ -71,9 +86,11 @@ public class QuizManagement extends BaseMenu {
                 case 4 ->{
                     int mode = modeSelect();
                     if(mode == MODE_OBJECTIVE){
-                        System.out.println("객관식 스펠링 퀴즈는 아직 준비 중입니다. 주관식으로 진행합니다.");
+                        OBJspellingQuiz();
                     }
-                    SUBspellingQuiz();
+                    else{
+                        SUBspellingQuiz();
+                    }
                 }
                 case 5 ->{
                     incorrectManagement.menu(scanner, this);
@@ -90,7 +107,9 @@ public class QuizManagement extends BaseMenu {
 
     
     /**
-     * 뜻 -> 영어 주관식 퀴즈입니다.
+     * 뜻 -> 영어 주관식 퀴즈를 실행합니다.
+     * 문제 수를 받고, 랜덤한 단어를 골라 한 문제씩 `subSUBKorEngQuiz`로 묻습니다.
+     * 맞추면 통계 정답을 올리고, 틀리면 오답 노트에 기록합니다.
      */
     public void SUBkorEngQuiz(){
         hintCount=0;
@@ -121,7 +140,9 @@ public class QuizManagement extends BaseMenu {
     }
 
     /**
-     * 영어 -> 뜻 주관식 퀴즈입니다.
+     * 영어 -> 뜻 주관식 퀴즈를 실행합니다.
+     * 문제 수만큼 단어를 뽑아 `subSUBEngKorQuiz`로 답을 입력받습니다.
+     * 각 문제 결과에 따라 통계/오답 기록을 업데이트합니다.
      */
     public void SUBengKorQuiz(){
         hintCount=0;
@@ -152,7 +173,66 @@ public class QuizManagement extends BaseMenu {
     }
 
     /**
-     * 스펠링 주관식 퀴즈입니다.
+     * 뜻 -> 영어 객관식 퀴즈를 실행합니다.
+     * 보기 번호를 고르고, 결과에 따라 통계/오답을 업데이트합니다.
+     */
+    public void OBJkorEngQuiz(){
+        hintCount=0;
+        int score = 0;
+        System.out.println("[뜻 -> 영어 객관식 퀴즈]");
+        int quizNumber = requestQuizCount(words.size());
+        if(quizNumber <= 0){
+            return;
+        }
+        List<Integer> list =pickN(words.size(),quizNumber);
+        for(int i=0;i<list.size();i++){
+            Word word = words.get(list.get(i));
+            boolean correct = subOBJKorEngQuiz(i, word);
+            if(correct){
+                score++;
+                statManagement.addKorEngCorrect();
+            }
+            else{
+                incorrectManagement.recordIncorrect(word, QUIZ_TYPE_KOR_ENG);
+                statManagement.addKorEngWrong();
+            }
+        }
+        System.out.println("점수 : "+ score);
+        statManagement.saveStatToFileWithWait(scanner, " 틀린 문항은 오답 노트에 기록됩니다 엔터를 누르면 통계를 저장합니다...");
+    }
+
+    /**
+     * 영어 -> 뜻 객관식 퀴즈를 실행합니다.
+     * /speak 를 이용해 다시 들을 수 있다는 안내를 넣었고, 보기 중에서 한글 뜻을 고르게 합니다.
+     */
+    public void OBJengKorQuiz(){
+        hintCount=0;
+        int score = 0;
+        System.out.println("[영어 -> 뜻 객관식 퀴즈]");
+        int quizNumber = requestQuizCount(words.size());
+        if(quizNumber <= 0){
+            return;
+        }
+        List<Integer> list =pickN(words.size(),quizNumber);
+        for(int i=0;i<list.size();i++){
+            Word word = words.get(list.get(i));
+            boolean correct = subOBJEngKorQuiz(i, word);
+            if(correct){
+                score++;
+                statManagement.addEngKorCorrect();
+            }
+            else{
+                incorrectManagement.recordIncorrect(word, QUIZ_TYPE_ENG_KOR);
+                statManagement.addEngKorWrong();
+            }
+        }
+        System.out.println("점수 : "+ score);
+        statManagement.saveStatToFileWithWait(scanner, " 틀린 문항은 오답 노트에 기록됩니다 엔터를 누르면 통계를 저장합니다...");
+    }
+
+    /**
+     * 스펠링 주관식 퀴즈를 실행합니다.
+     * 발음을 들려준 뒤 철자를 직접 입력받고, 힌트/다시듣기 명령을 처리합니다.
      */
     public void SUBspellingQuiz(){
         hintCount=0;
@@ -183,7 +263,38 @@ public class QuizManagement extends BaseMenu {
     }
 
     /**
-     * 예문 빈칸 주관식 퀴즈입니다.
+     * 스펠링 객관식 퀴즈를 실행합니다.
+     * 발음을 들려주고 보기에서 철자를 고르게 합니다.
+     */
+    public void OBJspellingQuiz(){
+        hintCount=0;
+        int score = 0;
+        System.out.println("[스펠링 객관식 퀴즈]");
+        int quizNumber = requestQuizCount(words.size());
+        if(quizNumber <= 0){
+            return;
+        }
+        List<Integer> list =pickN(words.size(),quizNumber);
+        for(int i=0;i<list.size();i++){
+            Word word = words.get(list.get(i));
+            boolean correct = subOBJSpellingQuiz(i, word);
+            if(correct){
+                score++;
+                statManagement.addSpellingCorrect();
+            }
+            else{
+                incorrectManagement.recordIncorrect(word, QUIZ_TYPE_SPELLING);
+                statManagement.addSpellingWrong();
+            }
+        }
+        System.out.println("점수 : "+ score);
+        statManagement.saveStatToFileWithWait(scanner, " 틀린 문항은 오답 노트에 기록됩니다 엔터를 누르면 통계를 저장합니다...");
+    }
+
+    /**
+     * 예문 빈칸 퀴즈를 실행합니다.
+     * 예문이 있는 단어만 걸러서 대상 목록을 만들고, 모드(주관/객관)에 따라 다른 출제 함수를 씁니다.
+     * 문제 수를 초과 입력하면 가능한 최대치로 맞춰주고, 결과는 통계/오답에 반영됩니다.
      */
     public void exampleQuiz(int mode){
         List<Integer> exampleIndices = new ArrayList<>();
@@ -232,7 +343,8 @@ public class QuizManagement extends BaseMenu {
     }
 
     /**
-     * 오답 노트를 기반으로 다시 푸는 퀴즈입니다.
+     * 오답 노트에 담긴 단어를 다시 푸는 퀴즈를 실행합니다.
+     * 유형 정보에 따라 적절한 질의 함수를 호출하고, 다시 맞히면 오답 기록을 지웁니다.
      */
     public void runIncorrectQuiz(Vector<IncorrectWord> incorrectWords){
         if(incorrectWords == null || incorrectWords.isEmpty()){
@@ -266,10 +378,11 @@ public class QuizManagement extends BaseMenu {
     }
 
     /**
-     * 오답 유형에 따라 적절한 퀴즈 함수를 호출합니다.
+     * 오답 유형 문자열을 보고 어떤 퀴즈로 물어볼지 결정합니다.
+     * 알 수 없는 유형이면 기본적으로 영어->뜻 주관식으로 진행합니다.
      */
     private boolean askIncorrectQuestion(String quizType, int number, Word word){
-        String type = quizType != null && !quizType.isEmpty() ? quizType : QUIZ_TYPE_ENG_KOR;
+        String type = normalizeQuizType(quizType);
         switch (type){
             case QUIZ_TYPE_KOR_ENG -> {
                 return subSUBKorEngQuiz(number, word);
@@ -293,6 +406,34 @@ public class QuizManagement extends BaseMenu {
             }
         }
     }
+
+    /**
+     * 오답 유형 문자열 앞부분을 표준 키워드로 통일합니다.
+     * 일치하는 접두사가 없으면 그대로 반환합니다.
+     */
+    private String normalizeQuizType(String quizType){
+        if(quizType == null || quizType.isEmpty()){
+            return QUIZ_TYPE_ENG_KOR;
+        }
+        if(quizType.startsWith(QUIZ_TYPE_KOR_ENG)){
+            return QUIZ_TYPE_KOR_ENG;
+        }
+        if(quizType.startsWith(QUIZ_TYPE_EXAMPLE)){
+            return QUIZ_TYPE_EXAMPLE;
+        }
+        if(quizType.startsWith(QUIZ_TYPE_SPELLING)){
+            return QUIZ_TYPE_SPELLING;
+        }
+        if(quizType.startsWith(QUIZ_TYPE_ENG_KOR)){
+            return QUIZ_TYPE_ENG_KOR;
+        }
+        return quizType;
+    }
+    
+    /**
+     * 안전하게 퀴즈 문항 수를 입력받습니다.
+     * 0 이하 입력 시 다시 묻고, 최대치보다 크면 가능한 최대 개수를 반환합니다.
+     */
     private int requestQuizCount(int available){
         if(available <= 0){
             System.out.println("등록된 단어가 없어 퀴즈를 진행할 수 없습니다.");
@@ -315,13 +456,14 @@ public class QuizManagement extends BaseMenu {
     }
 
     /**
-     * 객관식/주관식 모드를 선택받습니다. 현재는 안내 후 주관식만 진행됩니다.
+     * 객관식/주관식 모드를 입력받습니다.
+     * 1 또는 2를 입력할 때까지 반복하고, 숫자가 아니면 계속 안내합니다.
      */
     private int modeSelect(){
         while(true){
             System.out.println("퀴즈 모드를 선택하세요.");
             System.out.println("1. 주관식");
-            System.out.println("2. 객관식 (준비 중)");
+            System.out.println("2. 객관식");
             int mode = readInt(scanner, "모드를 선택해주세요 : ");
             if(mode == MODE_SUBJECTIVE || mode == MODE_OBJECTIVE){
                 return mode;
@@ -330,6 +472,10 @@ public class QuizManagement extends BaseMenu {
         }
     }
 
+    /**
+     * 0부터 len-1까지 번호 중 원하는 개수만큼 랜덤으로 뽑아 리스트로 반환합니다.
+     * 음수나 len보다 큰 값이 들어오면 범위를 맞춰줍니다.
+     */
     private static List<Integer> pickN(int len, int number) {
         List<Integer> list = new ArrayList<>();
         for (int i = 0; i < len; i++) {
@@ -346,6 +492,12 @@ public class QuizManagement extends BaseMenu {
         return new ArrayList<>(list.subList(0, number));
     }
 
+    /**
+     * 스펠링 주관식 한 문제를 묻습니다.
+     * @param number : 문제 번호(0부터 시작)
+     * @param word   : 현재 단어 객체
+     * @return 정답이면 true, 틀리면 false
+     */
     private boolean subSUBSpellingQuiz(int number, Word word){
         System.out.println();
         System.out.println((number+1)+"번 문제 ");
@@ -387,6 +539,10 @@ public class QuizManagement extends BaseMenu {
         }
     }
 
+    /**
+     * 예문 빈칸 주관식 한 문제를 묻습니다.
+     * 예문에서 정답 단어를 언더바로 가리고, /hint와 /speak 명령을 처리합니다.
+     */
     private boolean subSUBExampleQuiz(int number, Word word){
         System.out.println();
         System.out.println((number+1)+"번 문제 ");
@@ -434,6 +590,10 @@ public class QuizManagement extends BaseMenu {
             return false;
         }
     }
+    /**
+     * 예문 빈칸 객관식 한 문제를 묻습니다.
+     * 정답 단어와 다른 영어 단어 4개를 섞어 보기로 보여주고 번호를 입력받습니다.
+     */
     private boolean subOBJExampleQuiz(int number, Word word){
         System.out.println();
         System.out.println((number+1)+"번 문제 ");
@@ -457,6 +617,7 @@ public class QuizManagement extends BaseMenu {
         }
         engExList.add(english);
         Collections.shuffle(engExList);
+        System.out.println();
         for(int i =0;i<engExList.size();i++){
             System.out.println((i+1)+"번 : "+engExList.get(i));
         }
@@ -499,6 +660,119 @@ public class QuizManagement extends BaseMenu {
         }
     }
 
+    /**
+     * 영어 -> 뜻 객관식 한 문제를 묻습니다.
+     * /speak 로 발음을 다시 들려줄 수 있고, 번호 입력을 검증합니다.
+     */
+    private boolean subOBJEngKorQuiz(int number, Word word){
+        System.out.println();
+        System.out.println((number+1)+"번 문제 ");
+        String english = word.getEng();
+        System.out.println(english+" 의 뜻에 해당하는 번호를 선택해주세요.");
+        List<String> options = buildKoreanOptions(word);
+        printOptions(options);
+        System.out.println("\n필요하면 /speak 를 사용해 발음을 다시 들을 수 있습니다.");
+        while(true){
+            System.out.print("정답/명령 입력 -> ");
+            String input = scanner.nextLine().trim();
+            if(input.isEmpty()){
+                System.out.println("입력이 비어 있습니다. 번호를 입력하거나 /speak 를 사용해주세요.");
+                continue;
+            }
+            if(isSpeak(input)){
+                word.voiceEng();
+                System.out.println("단어를 다시 들려드렸습니다.");
+                continue;
+            }
+            int selected = parseChoice(input, options.size());
+            if(selected == -1){
+                continue;
+            }
+            String selectedValue = options.get(selected);
+            if(normalize(selectedValue).equals(normalize(getPrimaryMeaning(word)))){
+                return true;
+            }
+            return false;
+        }
+    }
+
+    /**
+     * 뜻 -> 영어 객관식 한 문제를 묻습니다.
+     * 한국어 뜻을 보여주고 영어 보기에서 고르게 합니다.
+     */
+    private boolean subOBJKorEngQuiz(int number, Word word){
+        System.out.println();
+        System.out.println((number+1)+"번 문제 ");
+        String[] korean = word.getKor();
+        for(int i=0;i<korean.length;i++){
+            if(i == korean.length-1){
+                System.out.print(korean[i]+" 의 뜻이 담긴 영어 단어를 선택해주세요  ");
+            }
+            else{
+                System.out.print(korean[i]+" , ");
+            }
+        }
+        List<String> options = buildEnglishOptions(word);
+        printOptions(options);
+        while(true){
+            System.out.print("정답 번호를 입력해주세요 -> ");
+            String input = scanner.nextLine().trim();
+            if(input.isEmpty()){
+                System.out.println("입력이 비어 있습니다. 번호를 입력해주세요.");
+                continue;
+            }
+            int selected = parseChoice(input, options.size());
+            if(selected == -1){
+                continue;
+            }
+            String selectedValue = options.get(selected);
+            if(normalize(selectedValue).equals(normalize(word.getEng()))){
+                return true;
+            }
+            return false;
+        }
+    }
+
+    /**
+     * 스펠링 객관식 한 문제를 묻습니다.
+     * 발음을 들려준 뒤 영어 보기에서 철자를 고르게 합니다.
+     */
+    private boolean subOBJSpellingQuiz(int number, Word word){
+        System.out.println();
+        System.out.println((number+1)+"번 문제 ");
+        word.voiceEng();
+        System.out.println("방금 들려드린 단어의 스펠링을 고르세요.");
+        List<String> options = buildEnglishOptions(word);
+        printOptions(options);
+        System.out.println("\n필요하면 /speak 를 사용해 단어를 다시 들을 수 있습니다.");
+        while(true){
+            System.out.print("정답/명령 입력 -> ");
+            String input = scanner.nextLine().trim();
+            if(input.isEmpty()){
+                System.out.println("입력이 비어 있습니다. 번호를 입력하거나 /speak 를 사용해주세요.");
+                continue;
+            }
+            if(isSpeak(input)){
+                word.voiceEng();
+                System.out.println("단어를 다시 들려드렸습니다.");
+                continue;
+            }
+            int selected = parseChoice(input, options.size());
+            if(selected == -1){
+                continue;
+            }
+            String selectedValue = options.get(selected);
+            if(normalize(selectedValue).equals(normalize(word.getEng()))){
+                return true;
+            }
+            return false;
+        }
+    }
+
+    /**
+     * 영어 -> 뜻 주관식 한 문제를 묻습니다.
+     * 한글 뜻 배열을 콤마로 분리해 여러 정답을 인정하고, /hint 명령을 지원합니다.
+     */
     private boolean subSUBEngKorQuiz(int number, Word word){
         System.out.println();
         System.out.println((number+1)+"번 문제 ");
@@ -555,6 +829,10 @@ public class QuizManagement extends BaseMenu {
         }
     }
 
+    /**
+     * 뜻 -> 영어 주관식 한 문제를 묻습니다.
+     * 힌트로 영어 철자를 한 글자씩 보여주며, 한글 뜻도 정답으로 인정합니다.
+     */
     private boolean subSUBKorEngQuiz(int number, Word word){
         System.out.println();
         System.out.println((number+1)+"번 문제 ");
@@ -619,6 +897,163 @@ public class QuizManagement extends BaseMenu {
         }
     }
 
+    /**
+     * 객관식 번호 문자열을 숫자로 바꾼 뒤 범위를 확인합니다.
+     * @return 유효하면 0부터 시작하는 인덱스, 아니면 -1
+     */
+    private int parseChoice(String input, int optionSize){
+        try{
+            int value = Integer.parseInt(input);
+            if(value < 1 || value > optionSize){
+                System.out.println("1부터 "+optionSize+" 사이의 번호를 입력해주세요.");
+                return -1;
+            }
+            return value-1;
+        }
+        catch (NumberFormatException e){
+            System.out.println("숫자만 입력해주세요.");
+            return -1;
+        }
+    }
+
+    /**
+     * 보기 문자열 리스트를 1번부터 순서대로 출력합니다.
+     */
+    private void printOptions(List<String> options){
+        for(int i=0;i<options.size();i++){
+            System.out.println((i+1)+"번 : "+options.get(i));
+        }
+    }
+
+    /**
+     * 영어 단어 보기를 만듭니다.
+     * 정답을 넣고, 다른 단어에서 중복되지 않는 오답을 뽑아 OBJindex 개수까지 채웁니다.
+     */
+    private List<String> buildEnglishOptions(Word answer){
+        Set<String> options = new LinkedHashSet<>();
+        String english = answer.getEng();
+        if(english != null && !english.trim().isEmpty()){
+            options.add(english);
+        }
+        List<Word> shuffled = new ArrayList<>(words);
+        Collections.shuffle(shuffled);
+        for(Word candidate : shuffled){
+            if(options.size() >= OBJindex){
+                break;
+            }
+            if(candidate == null){
+                continue;
+            }
+            String candidateEng = candidate.getEng();
+            if(candidateEng == null || candidateEng.trim().isEmpty()){
+                continue;
+            }
+            if(isSameNormalized(candidateEng, english)){
+                continue;
+            }
+            boolean duplicated = false;
+            for(String opt : options){
+                if(isSameNormalized(opt, candidateEng)){
+                    duplicated = true;
+                    break;
+                }
+            }
+            if(!duplicated){
+                options.add(candidateEng);
+            }
+        }
+        List<String> optionList = new ArrayList<>(options);
+        Collections.shuffle(optionList);
+        return optionList;
+    }
+
+    /**
+     * 한글 뜻 보기를 만듭니다.
+     * 첫 번째 의미를 정답으로 넣고, 다른 단어의 첫 의미로 오답을 채웁니다.
+     */
+    private List<String> buildKoreanOptions(Word answer){
+        Set<String> options = new LinkedHashSet<>();
+        String primaryMeaning = getPrimaryMeaning(answer);
+        if(!primaryMeaning.isEmpty()){
+            options.add(primaryMeaning);
+        }
+        List<Word> shuffled = new ArrayList<>(words);
+        Collections.shuffle(shuffled);
+        for(Word candidate : shuffled){
+            if(options.size() >= OBJindex){
+                break;
+            }
+            if(candidate == null){
+                continue;
+            }
+            String meaning = getPrimaryMeaning(candidate);
+            if(meaning.isEmpty() || isSameNormalized(meaning, primaryMeaning)){
+                continue;
+            }
+            boolean duplicated = false;
+            for(String opt : options){
+                if(isSameNormalized(opt, meaning)){
+                    duplicated = true;
+                    break;
+                }
+            }
+            if(!duplicated){
+                options.add(meaning);
+            }
+        }
+        List<String> optionList = new ArrayList<>(options);
+        Collections.shuffle(optionList);
+        return optionList;
+    }
+
+    /**
+     * 단어의 첫 번째 한글 뜻을 돌려줍니다.
+     * 한글 뜻이 없다면 영어 단어를 대신 돌려줍니다.
+     */
+    private String getPrimaryMeaning(Word word){
+        List<String> meanings = extractMeanings(word);
+        if(!meanings.isEmpty()){
+            return meanings.get(0);
+        }
+        String english = word.getEng();
+        if(english == null){
+            return "";
+        }
+        return english;
+    }
+
+    /**
+     * Word 객체에서 한글 뜻을 모두 뽑아 리스트로 만듭니다.
+     * 콤마로 여러 뜻을 구분하고, 공백/빈칸은 제외합니다.
+     */
+    private List<String> extractMeanings(Word word){
+        List<String> meaningList = new ArrayList<>();
+        String[] koreans = word.getKor();
+        for(String kor : koreans){
+            if(kor == null){
+                continue;
+            }
+            String[] split = kor.split(",");
+            for(String candidate : split){
+                String trimmed = candidate.trim();
+                if(!trimmed.isEmpty()){
+                    meaningList.add(trimmed);
+                }
+            }
+        }
+        return meaningList;
+    }
+
+    /**
+     * normalize 후 문자열이 같은지 비교합니다.
+     */
+    private boolean isSameNormalized(String first, String second){
+        return normalize(first).equals(normalize(second));
+    }
+
+    /**
+     * 입력이 /hint인지 확인하고, 맞으면 힌트 사용 횟수를 올립니다.
+     */
     private static boolean isHint(String str){
         if(str.equals("/hint")){
             hintCount++;
@@ -627,10 +1062,16 @@ public class QuizManagement extends BaseMenu {
         return false;
     }
 
+    /**
+     * 입력이 /speak 명령인지 확인합니다.
+     */
     private static boolean isSpeak(String str){
         return str.equals("/speak");
     }
 
+    /**
+     * 공백과 대소문자를 무시하기 위해 문자열을 소문자+공백 제거 형태로 변환합니다.
+     */
     private static String normalize(String input){
         if(input == null){
             return "";
@@ -645,6 +1086,10 @@ public class QuizManagement extends BaseMenu {
         return normalized;
     }
 
+    /**
+     * 예문에서 정답 단어를 언더바로 가리고 반환합니다.
+     * 정답이 안 보이면 원문을 그대로 돌려줍니다.
+     */
     private static String hideAnswerInExample(String example, String english){
         if(example == null || english == null || english.isEmpty()){
             return example != null ? example : "";
@@ -676,6 +1121,9 @@ public class QuizManagement extends BaseMenu {
         return result;
     }
 
+    /**
+     * 정답 길이에 맞춰 언더바로 된 빈칸 문자열을 만듭니다.
+     */
     private static String buildBlank(int length){
         if(length <= 0){
             return "_____";
