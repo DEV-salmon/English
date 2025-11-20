@@ -1,95 +1,90 @@
 package voca.management;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import voca.core.UserSession;
 
 public class StatManagement {
 
-    private int correct_obj;
-    private int wrong_obj;
-    private int correct_sub;
-    private int wrong_sub;
+    private int korEng_correct;
+    private int korEng_wrong;
 
-    private final UserSession session;
-    private final String vocaFileName;
+    private int engKor_correct;
+    private int engKor_wrong;
 
-    public StatManagement(UserSession session, String vocaFilePath) {
-        this.session = session;
-        this.vocaFileName = new File(vocaFilePath).getName();  
+    private int example_correct;
+    private int example_wrong;
+
+    private int spelling_correct;
+    private int spelling_wrong;
+
+    public void addKorEngCorrect() { korEng_correct++; }
+    public void addKorEngWrong() { korEng_wrong++; }
+
+    public void addEngKorCorrect() { engKor_correct++; }
+    public void addEngKorWrong() { engKor_wrong++; }
+
+    public void addExampleCorrect() { example_correct++; }
+    public void addExampleWrong() { example_wrong++; }
+
+    public void addSpellingCorrect() { spelling_correct++; }
+    public void addSpellingWrong() { spelling_wrong++; }
+
+    public int getKorEngTotal() { return korEng_correct + korEng_wrong; }
+    public int getEngKorTotal() { return engKor_correct + engKor_wrong; }
+    public int getExampleTotal() { return example_correct + example_wrong; }
+    public int getSpellingTotal() { return spelling_correct + spelling_wrong; }
+
+    private double calcMean(int c, int w) {
+        if (c + w == 0) return 0.0;
+        return (double) c / (c + w);
     }
 
-    public int getCorrect_obj() { return correct_obj; }
-    public void setCorrect_obj(int correct_obj) { this.correct_obj = correct_obj; }
-
-    public int getWrong_obj() { return wrong_obj; }
-    public void setWrong_obj(int wrong_obj) { this.wrong_obj = wrong_obj; }
-
-    public int getCorrect_sub() { return correct_sub; }
-    public void setCorrect_sub(int correct_sub) { this.correct_sub = correct_sub; }
-
-    public int getWrong_sub() { return wrong_sub; }
-    public void setWrong_sub(int wrong_sub) { this.wrong_sub = wrong_sub; }
-
-    public int getTotal_obj() { return correct_obj + wrong_obj; }
-    public int getTotal_sub() { return correct_sub + wrong_sub; }
-
-    public double getMean_obj() {
-        if (getTotal_obj() == 0) return 0.0;
-        return (double) correct_obj / getTotal_obj();
-    }
-
-    public double getMean_sub() {
-        if (getTotal_sub() == 0) return 0.0;
-        return (double) correct_sub / getTotal_sub();
-    }
-
-    public double getVar_obj() {
-        double p = getMean_obj();
+    private double calcVar(int c, int w) {
+        double p = calcMean(c, w);
         return p * (1 - p);
     }
 
-    public double getVar_sub() {
-        double p = getMean_sub();
-        return p * (1 - p);
+    private double calcStd(int c, int w) {
+        return Math.sqrt(calcVar(c, w));
     }
-
-    public double getStd_obj() { return Math.sqrt(getVar_obj()); }
-    public double getStd_sub() { return Math.sqrt(getVar_sub()); }
 
     public void saveStatToFile() {
+        String filename = "Voca/src/res/stat.txt";
 
-        String statDirPath = session.getUserDirectory() + "/stat/";
-        File statDir = new File(statDirPath);
-        if (!statDir.exists()) statDir.mkdirs();
+        try (FileWriter fw = new FileWriter(filename)) {
 
-        String savePath = statDirPath + vocaFileName + ".stat";
+            fw.write("===== 통계 =====\n\n");
 
-        try (FileWriter fw = new FileWriter(savePath)) {
+            fw.write("[뜻 → 영어]\n");
+            writeTypeStats(fw, korEng_correct, korEng_wrong);
 
-            fw.write("===== 통계 =====\n");
+            fw.write("\n[영어 → 뜻]\n");
+            writeTypeStats(fw, engKor_correct, engKor_wrong);
 
-            fw.write("=== 객관식 ===\n");
-            fw.write("총 문제 수    : " + getTotal_obj() + "\n");
-            fw.write("맞은 문제 수  : " + getCorrect_obj() + "\n");
-            fw.write("틀린 문제 수  : " + getWrong_obj() + "\n");
-            fw.write("평균(정답률)  : " + String.format(\"%.4f\", getMean_obj()) + "\n");
-            fw.write("분산          : " + String.format(\"%.6f\", getVar_obj()) + "\n");
-            fw.write("표준편차      : " + String.format(\"%.6f\", getStd_obj()) + "\n\n");
+            fw.write("\n[예문 빈칸]\n");
+            writeTypeStats(fw, example_correct, example_wrong);
 
-            fw.write("=== 주관식 ===\n");
-            fw.write("총 문제 수    : " + getTotal_sub() + "\n");
-            fw.write("맞은 문제 수  : " + getCorrect_sub() + "\n");
-            fw.write("틀린 문제 수  : " + getWrong_sub() + "\n");
-            fw.write("평균(정답률)  : " + String.format(\"%.4f\", getMean_sub()) + "\n");
-            fw.write("분산          : " + String.format(\"%.6f\", getVar_sub()) + "\n");
-            fw.write("표준편차      : " + String.format(\"%.6f\", getStd_sub()) + "\n");
+            fw.write("\n[스펠링]\n");
+            writeTypeStats(fw, spelling_correct, spelling_wrong);
 
             fw.write("===========================\n");
 
         } catch (IOException e) {
             System.out.println("저장 오류: " + e.getMessage());
         }
+    }
+
+    private void writeTypeStats(FileWriter fw, int correct, int wrong) throws IOException {
+        int total = correct + wrong;
+        fw.write("총 문제 수    : " + total + "\n");
+        fw.write("맞은 문제 수  : " + correct + "\n");
+        fw.write("틀린 문제 수  : " + wrong + "\n");
+        fw.write("평균(정답률)  : " + String.format("%.4f", calcMean(correct, wrong)) + "\n");
+        fw.write("분산          : " + String.format("%.6f", calcVar(correct, wrong)) + "\n");
+        fw.write("표준편차      : " + String.format("%.6f", calcStd(correct, wrong)) + "\n");
+    }
+
+    public static void saveStat(StatManagement stat) {
+        stat.saveStatToFile();
     }
 }
