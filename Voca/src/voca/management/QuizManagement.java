@@ -6,6 +6,8 @@ import voca.core.IncorrectWord;
 import voca.core.UserSession;
 import voca.core.Word;
 
+import static java.lang.Integer.parseInt;
+
 public class QuizManagement extends BaseMenu {
     private static final String QUIZ_TYPE_KOR_ENG = "KOR_ENG";
     private static final String QUIZ_TYPE_ENG_KOR = "ENG_KOR";
@@ -13,10 +15,12 @@ public class QuizManagement extends BaseMenu {
     private static final String QUIZ_TYPE_SPELLING = "SPELLING";
     private static final int MODE_SUBJECTIVE = 1;
     private static final int MODE_OBJECTIVE = 2;
+    private static final int OBJindex = 5;
     private final Vector<Word> words;
     private final IncorrectManagement incorrectManagement;
     private final StatManagement statManagement;
-    private final Scanner scanner = new Scanner(System.in);
+    private final Random random = new Random();
+    private static final Scanner scanner = new Scanner(System.in);
     private static int hintCount = 0;
 
     public QuizManagement(Vector<Word> words, UserSession session){
@@ -62,10 +66,7 @@ public class QuizManagement extends BaseMenu {
                 }
                 case 3 ->{
                     int mode = modeSelect();
-                    if(mode == MODE_OBJECTIVE){
-                        System.out.println("객관식 예문 빈칸 퀴즈는 아직 준비 중입니다. 주관식으로 진행합니다.");
-                    }
-                    SUBexampleQuiz();
+                        exampleQuiz(mode);
                 }
                 case 4 ->{
                     int mode = modeSelect();
@@ -184,7 +185,7 @@ public class QuizManagement extends BaseMenu {
     /**
      * 예문 빈칸 주관식 퀴즈입니다.
      */
-    public void SUBexampleQuiz(){
+    public void exampleQuiz(int mode){
         List<Integer> exampleIndices = new ArrayList<>();
         for(int i=0;i<words.size();i++){
             String example = words.get(i).getEx();
@@ -200,7 +201,7 @@ public class QuizManagement extends BaseMenu {
 
         hintCount=0;
         int score = 0;
-        System.out.println("[예문 빈칸 퀴즈]");
+        System.out.println(mode == 1 ? "[예문 빈칸 주관식 퀴즈]" :"[예문 빈칸 객관식 퀴즈]");
         System.out.println("정답 또는 /hint, /speak 를 입력해주세요.");
         System.out.println("예문이 없는 단어는 자동으로 제외됩니다.");
         int quizNumber = readInt(scanner, "원하시는 퀴즈 문항 수를 입력해주세요 : ");
@@ -215,13 +216,13 @@ public class QuizManagement extends BaseMenu {
         Collections.shuffle(exampleIndices);
         for(int i=0;i<quizNumber;i++){
             Word word = words.get(exampleIndices.get(i));
-            boolean correct = subSUBExampleQuiz(i, word);
+            boolean correct = mode == 1? subSUBExampleQuiz(i, word) : subOBJExampleQuiz(i, word);
             if(correct){
                 score++;
                 statManagement.addExampleCorrect();
             }
             else{
-                incorrectManagement.recordIncorrect(word, QUIZ_TYPE_EXAMPLE);
+                incorrectManagement.recordIncorrect(word, QUIZ_TYPE_EXAMPLE+(mode == 1?" - SUBJECTIVE":" - OBJECTIVE"));
                 statManagement.addExampleWrong();
             }
         }
@@ -433,11 +434,70 @@ public class QuizManagement extends BaseMenu {
             return false;
         }
     }
+    private boolean subOBJExampleQuiz(int number, Word word){
+        System.out.println();
+        System.out.println((number+1)+"번 문제 ");
+        String example = word.getEx();
+        if(example == null || example.trim().isEmpty()){
+            System.out.println("예문이 없어 해당 문제를 건너뜁니다.");
+            return false;
+        }
+        String english = word.getEng();
+        String blankSentence = hideAnswerInExample(example, english);
+        System.out.println("예문 : "+blankSentence+"\n");
+        word.voiceEx();
+
+        List<String> engExList = new ArrayList<>();
+        Set<String> unqList = new HashSet<>();
+        while (engExList.size() < 4) {  // 원하는 개수
+            String addEnglish = words.get(random.nextInt(words.size())).getEng();
+            if (addEnglish != null && !addEnglish.equals(english) && unqList.add(addEnglish)) {
+                engExList.add(addEnglish);
+            }
+        }
+        engExList.add(english);
+        Collections.shuffle(engExList);
+        for(int i =0;i<engExList.size();i++){
+            System.out.println((i+1)+"번 : "+engExList.get(i));
+        }
+
+        System.out.println("\n빈칸에 들어갈 단어에 해당하는 번호를 입력해주세요.");
+        System.out.println("필요하면 /hint 또는 /speak 를 사용할 수 있습니다.");
+        int hintIndex = 0;
+        while (true) {
+            System.out.print("정답/명령 입력 -> ");
+            String answer = scanner.nextLine().trim();
+            if(answer.isEmpty()){
+                System.out.println("입력이 비어 있습니다. 정답 또는 /hint, /speak 를 입력해주세요.");
+                continue;
+            }
+            if(isHint(answer)){
+                if(hintIndex == english.length()){
+                    System.out.println("이미 정답을 알아내셨습니다. 답을 입력해주세요");
+                }
+                else{
+                    System.out.println();
+                    System.out.println("현재 "+ (hintCount)+"번 만큼 힌트를 사용하셨습니다.");
+                    System.out.println("hint : "+(hintIndex+1)+"번째 철자는 "+english.charAt(hintIndex)+" 입니다");
+                    hintIndex++;
+                }
+                continue;
+            }
+            if(isSpeak(answer)){
+                word.voiceEx();
+                System.out.println("예문을 다시 들려드렸습니다.");
+                continue;
+            }
 
 
 
-
-
+            String normalized = normalize(engExList.get(parseInt(answer)-1));
+            if(normalized.equals(normalize(english))){
+                return true;
+            }
+            return false;
+        }
+    }
 
     private boolean subSUBEngKorQuiz(int number, Word word){
         System.out.println();

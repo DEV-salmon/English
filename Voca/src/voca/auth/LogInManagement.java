@@ -95,8 +95,6 @@ public class LogInManagement extends BaseMenu {
 
     /**
      * 회원가입을 하는 메소드입니다.
-     * @param scanner   입력을 위한 scanner객체입니다.
-     * @param loginList 로그인 정보를 저장할 벡터 객체입니다.
      */
     private void registerUser(){
         try {
@@ -140,8 +138,6 @@ public class LogInManagement extends BaseMenu {
 
     /**
      * 로그인을 하는 메소드입니다.
-     * @param scanner   입력을 위한 scanner객체입니다.
-     * @param loginList 로그인 정보 비교를 위한 벡터 객체입니다.
      */
     private void loginUser() {
         if(loginList.isEmpty()){

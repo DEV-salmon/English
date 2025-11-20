@@ -131,15 +131,15 @@ public class StatManagement extends BaseMenu {
         double v4 = variance(spelling_correct, spelling_wrong);
 
         XYSeriesCollection dataset = new XYSeriesCollection();
-        dataset.addSeries(createNormalSeries("뜻→영어", m1, v1));
-        dataset.addSeries(createNormalSeries("영어→뜻", m2, v2));
-        dataset.addSeries(createNormalSeries("예문", m3, v3));
-        dataset.addSeries(createNormalSeries("스펠링", m4, v4));
+        dataset.addSeries(createNormalSeries("Meaning→English", m1, v1));
+        dataset.addSeries(createNormalSeries("English→Meaning", m2, v2));
+        dataset.addSeries(createNormalSeries("Example", m3, v3));
+        dataset.addSeries(createNormalSeries("Spelling", m4, v4));
 
         JFreeChart chart = ChartFactory.createXYLineChart(
-                "퀴즈별 정답률 정규분포",
-                "정답률",
-                "확률밀도",
+                "Normal Distribution of Correct Answer rates by Quiz",
+                "Correct Answer rates",
+                "Probability Density",
                 dataset,
                 PlotOrientation.VERTICAL,
                 true,
