@@ -146,7 +146,7 @@ public class LogInManagement extends BaseMenu {
             return;
         }
         try{
-            System.out.println("아이디를 입력하십시오 : ");
+            System.out.println("아이디를 입력하십시오");
             System.out.print("아이디 : ");
             String pid = scanner.next();
             scanner.nextLine();
