@@ -88,19 +88,49 @@ public class Voca {
             return;
         }
         Scanner scanner = new Scanner(System.in);
-        System.out.println("검색할 내용을 입력하세요.");
-        String input = scanner.nextLine();
-        for(int i = voca.size() - 1 ; i>=0;i--){
-            if(voca.get(i).getEng().equals(input)){
-                System.out.println("\n"+voca.get(i).toString());
-                return;
+        System.out.println("검색방법을 선택하세요.(1:영어 2:한글 3:포함문자)");
+        int sel = scanner.nextInt();;
+        scanner.nextLine();
+        switch (sel){
+            case 1->{
+                System.out.println("검색할 단어를 입력하세요.");
+                String input = scanner.nextLine();
+                for(int i = voca.size() - 1 ; i>=0;i--) {
+                    if (voca.get(i).getEng().equals(input)) {
+                        System.out.println("\n" + voca.get(i).toString());
+                        return;
+                    }
+                }
+                System.out.println("해당 단어를 찾을 수 없습니다.");
             }
-            if(voca.get(i).getKor().equals(input)){
-                System.out.println("\n"+voca.get(i).toString());
-                return;
+            case 2->{
+                System.out.println("검색할 뜻을 입력하세요.");
+                String input = scanner.nextLine();
+                for(int i = voca.size() - 1 ; i>=0;i--) {
+                    if (voca.get(i).getKor().equals(input)) {
+                        System.out.println("\n" + voca.get(i).toString());
+                        return;
+                    }
+                }
+                System.out.println("해당 단어를 찾을 수 없습니다.");
+            }
+            case 3->{
+                boolean isExistConWord = false;
+                System.out.println("검색할 포함문자를 입력하세요.");
+                String input = scanner.nextLine();
+                for(Word w : voca) {
+                    if (w.getEng().contains(input)) {
+                        System.out.println("\n"+ w );
+                        isExistConWord = true;
+                    }
+                }
+                if(!(isExistConWord))
+                    System.out.println("해당 문자를 포함한 단어를 찾을 수 없습니다.");
+            }
+            default -> {
+                System.out.println("잘못된 입력입니다.");
             }
         }
-        System.out.println("해당 단어를 찾을 수 없습니다.");
     }
 
     public static void printWord(){
