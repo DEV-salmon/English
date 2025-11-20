@@ -9,15 +9,17 @@ import voca.core.Word;
 
 public class IncorrectManagement extends BaseMenu {
     private final String incorrectFilePath;
-    private final Vector<IncorrectWord> cachedIncorrectWords = new Vector<>();
-    private final Set<String> incorrectWordKeys = new HashSet<>();
-    private boolean cacheInitialized = false;
+    private final Vector<IncorrectWord> notes = new Vector<>();
+    private final Set<String> noteKeys = new HashSet<>();
 
     public IncorrectManagement(UserSession session){
         this.incorrectFilePath = session.getIncorrectFilePath();
         ensureFile();
     }
 
+    /**
+     * 오답 메뉴를 보여주고 선택된 기능을 실행합니다.
+     */
     public void menu(Scanner scanner, QuizManagement quizManagement){
         initializeIncorrectNotes();
         cleanConsole();
@@ -43,6 +45,9 @@ public class IncorrectManagement extends BaseMenu {
         }
     }
 
+    /**
+     * 오답을 파일에 추가합니다. (중복은 noteKeys로 방지)
+     */
     public void recordIncorrect(Word word, String quizType){
         if(word == null){
             return;
@@ -54,13 +59,13 @@ public class IncorrectManagement extends BaseMenu {
         String kor = safeString(String.join(", ", word.getKor()));
         String ex = safeString(word.getEx());
         String key = buildKey(eng, kor, ex, type);
-        if(incorrectWordKeys.contains(key)){
+        if(noteKeys.contains(key)){
             return;
         }
         try(PrintWriter writer = new PrintWriter(new FileWriter(incorrectFilePath, true))){
             writer.println(formatLine(eng, kor, ex, type));
-            incorrectWordKeys.add(key);
-            cachedIncorrectWords.add(buildIncorrectWord(eng, kor, ex, type));
+            noteKeys.add(key);
+            notes.add(buildIncorrectWord(eng, kor, ex, type));
         }
         catch (IOException e){
             System.out.println("오답 노트를 기록하는 동안 오류가 발생했습니다 : "+e.getMessage());
@@ -73,33 +78,34 @@ public class IncorrectManagement extends BaseMenu {
         }
         initializeIncorrectNotes();
         String key = buildKey(word, word.getQuizType());
-        if(!incorrectWordKeys.remove(key)){
+        if(!noteKeys.remove(key)){
             return;
         }
-        cachedIncorrectWords.removeIf(existing -> buildKey(existing, existing.getQuizType()).equals(key));
+        notes.removeIf(existing -> buildKey(existing, existing.getQuizType()).equals(key));
         rewriteIncorrectFile();
     }
 
+    /**
+     * 오답 노트 파일을 읽어 현재 목록을 준비합니다.
+     */
     public void initializeIncorrectNotes(){
         ensureFile();
-        if(cacheInitialized){
-            return;
-        }
         Vector<IncorrectWord> parsed = parseIncorrectWords();
-        rebuildCache(parsed);
+        rebuildNotes(parsed);
         rewriteIncorrectFile();
-        cacheInitialized = true;
     }
 
+    /**
+     * 오답 노트를 비웁니다. (목록/키 모두 초기화)
+     */
     private void clearIncorrect(Scanner scanner){
         ensureFile();
         try(PrintWriter writer = new PrintWriter(new FileWriter(incorrectFilePath))){
             writer.print("");
             System.out.println("오답 노트를 초기화했습니다.");
             waitConsole(scanner, "엔터를 누르면 이전 메뉴로 돌아갑니다...");
-            cachedIncorrectWords.clear();
-            incorrectWordKeys.clear();
-            cacheInitialized = true;
+            notes.clear();
+            noteKeys.clear();
         }
         catch (IOException e){
             System.out.println("오답 노트를 초기화하는 동안 오류가 발생했습니다 : "+e.getMessage());
@@ -140,25 +146,31 @@ public class IncorrectManagement extends BaseMenu {
         return incorrectWords;
     }
 
-    private void rebuildCache(Vector<IncorrectWord> incorrectWords){
-        cachedIncorrectWords.clear();
-        incorrectWordKeys.clear();
+    /**
+     * 파일에서 읽어온 오답들을 내부 목록에 재적재합니다. (중복은 noteKeys로 필터)
+     */
+    private void rebuildNotes(Vector<IncorrectWord> incorrectWords){
+        notes.clear();
+        noteKeys.clear();
         for(IncorrectWord word : incorrectWords){
             String eng = safeString(word.getEng());
             String kor = safeString(String.join(", ", word.getKor()));
             String ex = safeString(word.getEx());
             String quizType = safeString(word.getQuizType());
             String key = buildKey(eng, kor, ex, quizType);
-            if(incorrectWordKeys.add(key)){
-                cachedIncorrectWords.add(buildIncorrectWord(eng, kor, ex, quizType));
+            if(noteKeys.add(key)){
+                notes.add(buildIncorrectWord(eng, kor, ex, quizType));
             }
         }
     }
 
+    /**
+     * 현재 목록을 파일로 다시 씁니다.
+     */
     private void rewriteIncorrectFile(){
         ensureFile();
         try(PrintWriter writer = new PrintWriter(new FileWriter(incorrectFilePath))){
-            for(IncorrectWord incorrectWord : cachedIncorrectWords){
+            for(IncorrectWord incorrectWord : notes){
                 String eng = safeString(incorrectWord.getEng());
                 String kor = safeString(String.join(", ", incorrectWord.getKor()));
                 String ex = safeString(incorrectWord.getEx());
@@ -173,12 +185,15 @@ public class IncorrectManagement extends BaseMenu {
 
     private Vector<IncorrectWord> getIncorrectWordsSnapshot(){
         initializeIncorrectNotes();
-        return new Vector<>(cachedIncorrectWords);
+        return new Vector<>(notes);
     }
 
+    /**
+     * 기록된 오답 노트를 콘솔에 출력합니다.
+     */
     private void printIncorrectNotes(Scanner scanner){
         initializeIncorrectNotes();
-        if(cachedIncorrectWords.isEmpty()){
+        if(notes.isEmpty()){
             System.out.println("기록된 오답이 없습니다.");
             waitConsole(scanner, "엔터를 누르면 이전 메뉴로 돌아갑니다...");
             return;
@@ -186,7 +201,7 @@ public class IncorrectManagement extends BaseMenu {
 
         System.out.println("===== 기록된 오답 =====");
         int index = 1;
-        for(IncorrectWord incorrectWord : cachedIncorrectWords){
+        for(IncorrectWord incorrectWord : notes){
             String eng = safeString(incorrectWord.getEng());
             String kor = safeString(String.join(", ", incorrectWord.getKor()));
             String ex = safeString(incorrectWord.getEx());
@@ -224,6 +239,9 @@ public class IncorrectManagement extends BaseMenu {
         return kor;
     }
 
+    /**
+     * 단어/예문/유형을 조합해 고유 키를 만듭니다.
+     */
     private String buildKey(Word word, String quizTypeOverride){
         String eng = safeString(word.getEng());
         String kor = safeString(String.join(", ", word.getKor()));
@@ -233,8 +251,11 @@ public class IncorrectManagement extends BaseMenu {
     }
 
     private String buildKey(String eng, String kor, String ex, String quizType){
-        return safeString(eng).toLowerCase()+"|"+safeString(kor).toLowerCase()+"|"+
-                safeString(ex).toLowerCase()+"|"+safeString(quizType).toLowerCase();
+        String normalizedEng = safeString(eng).toLowerCase();
+        String normalizedKor = safeString(kor).toLowerCase();
+        String normalizedEx = safeString(ex).toLowerCase();
+        String normalizedType = safeString(quizType).toLowerCase();
+        return normalizedEng + "|" + normalizedKor + "|" + normalizedEx + "|" + normalizedType;
     }
 
     private String formatLine(String eng, String kor, String ex, String quizType){

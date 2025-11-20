@@ -11,6 +11,8 @@ public class QuizManagement extends BaseMenu {
     private static final String QUIZ_TYPE_ENG_KOR = "ENG_KOR";
     private static final String QUIZ_TYPE_EXAMPLE = "EXAMPLE";
     private static final String QUIZ_TYPE_SPELLING = "SPELLING";
+    private static final int MODE_SUBJECTIVE = 1;
+    private static final int MODE_OBJECTIVE = 2;
     private final Vector<Word> words;
     private final IncorrectManagement incorrectManagement;
     private final StatManagement statManagement;
@@ -23,6 +25,9 @@ public class QuizManagement extends BaseMenu {
         this.statManagement = new StatManagement(session);
     }
 
+    /**
+     * 퀴즈 메뉴를 보여주고 선택에 따라 각 퀴즈/오답 메뉴로 이동합니다.
+     */
     public void menu(){
         incorrectManagement.initializeIncorrectNotes();
         cleanConsole();
@@ -42,16 +47,32 @@ public class QuizManagement extends BaseMenu {
             int menuNum = readInt(scanner, "원하시는 항목 번호를 입력해주세요 -> ");
             switch (menuNum) {
                 case 1 ->{
-                    korEngQuiz();
+                    int mode = modeSelect();
+                    if(mode == MODE_OBJECTIVE){
+                        System.out.println("객관식 뜻 -> 영어 퀴즈는 아직 준비 중입니다. 주관식으로 진행합니다.");
+                    }
+                    SUBkorEngQuiz();
                 }
                 case 2 ->{
-                    engKorQuiz();
+                    int mode = modeSelect();
+                    if(mode == MODE_OBJECTIVE){
+                        System.out.println("객관식 영어 -> 뜻 퀴즈는 아직 준비 중입니다. 주관식으로 진행합니다.");
+                    }
+                    SUBengKorQuiz();
                 }
                 case 3 ->{
-                    exampleQuiz();
+                    int mode = modeSelect();
+                    if(mode == MODE_OBJECTIVE){
+                        System.out.println("객관식 예문 빈칸 퀴즈는 아직 준비 중입니다. 주관식으로 진행합니다.");
+                    }
+                    SUBexampleQuiz();
                 }
                 case 4 ->{
-                    spellingQuiz();
+                    int mode = modeSelect();
+                    if(mode == MODE_OBJECTIVE){
+                        System.out.println("객관식 스펠링 퀴즈는 아직 준비 중입니다. 주관식으로 진행합니다.");
+                    }
+                    SUBspellingQuiz();
                 }
                 case 5 ->{
                     incorrectManagement.menu(scanner, this);
@@ -67,7 +88,10 @@ public class QuizManagement extends BaseMenu {
     }
 
     
-    public void korEngQuiz(){
+    /**
+     * 뜻 -> 영어 주관식 퀴즈입니다.
+     */
+    public void SUBkorEngQuiz(){
         hintCount=0;
         int score = 0;
         System.out.println("[뜻 -> 영어 퀴즈]");
@@ -80,7 +104,7 @@ public class QuizManagement extends BaseMenu {
         List<Integer> list =pickN(words.size(),quizNumber);
         for(int i=0;i<list.size();i++){
             Word word = words.get(list.get(i));
-            boolean correct = subKorEngQuiz(i, word);
+            boolean correct = subSUBKorEngQuiz(i, word);
             if(correct){
                 score++;
                 statManagement.addKorEngCorrect();
@@ -94,7 +118,11 @@ public class QuizManagement extends BaseMenu {
         System.out.println("점수 : "+ score);
         statManagement.saveStatToFileWithWait(scanner, " 틀린 문항은 오답 노트에 기록됩니다 엔터를 누르면 통계를 저장합니다...");
     }
-    public void engKorQuiz(){
+
+    /**
+     * 영어 -> 뜻 주관식 퀴즈입니다.
+     */
+    public void SUBengKorQuiz(){
         hintCount=0;
         int score = 0;
         System.out.println("[영어 -> 뜻 퀴즈]");
@@ -107,7 +135,7 @@ public class QuizManagement extends BaseMenu {
         List<Integer> list =pickN(words.size(),quizNumber);
         for(int i=0;i<list.size();i++){
             Word word = words.get(list.get(i));
-            boolean correct = subEngKorQuiz(i, word);
+            boolean correct = subSUBEngKorQuiz(i, word);
             if(correct){
                 score++;
                 statManagement.addEngKorCorrect();
@@ -122,7 +150,10 @@ public class QuizManagement extends BaseMenu {
         statManagement.saveStatToFileWithWait(scanner, " 틀린 문항은 오답 노트에 기록됩니다 엔터를 누르면 통계를 저장합니다...");
     }
 
-    public void spellingQuiz(){
+    /**
+     * 스펠링 주관식 퀴즈입니다.
+     */
+    public void SUBspellingQuiz(){
         hintCount=0;
         int score = 0;
         System.out.println("[스펠링 퀴즈]");
@@ -135,7 +166,7 @@ public class QuizManagement extends BaseMenu {
         List<Integer> list =pickN(words.size(),quizNumber);
         for(int i=0;i<list.size();i++){
             Word word = words.get(list.get(i));
-            boolean correct = subSpellingQuiz(i, word);
+            boolean correct = subSUBSpellingQuiz(i, word);
             if(correct){
                 score++;
                 statManagement.addSpellingCorrect();
@@ -150,7 +181,10 @@ public class QuizManagement extends BaseMenu {
         statManagement.saveStatToFileWithWait(scanner, " 틀린 문항은 오답 노트에 기록됩니다 엔터를 누르면 통계를 저장합니다...");
     }
 
-    public void exampleQuiz(){
+    /**
+     * 예문 빈칸 주관식 퀴즈입니다.
+     */
+    public void SUBexampleQuiz(){
         List<Integer> exampleIndices = new ArrayList<>();
         for(int i=0;i<words.size();i++){
             String example = words.get(i).getEx();
@@ -181,7 +215,7 @@ public class QuizManagement extends BaseMenu {
         Collections.shuffle(exampleIndices);
         for(int i=0;i<quizNumber;i++){
             Word word = words.get(exampleIndices.get(i));
-            boolean correct = subExampleQuiz(i, word);
+            boolean correct = subSUBExampleQuiz(i, word);
             if(correct){
                 score++;
                 statManagement.addExampleCorrect();
@@ -196,6 +230,9 @@ public class QuizManagement extends BaseMenu {
         statManagement.saveStatToFileWithWait(scanner, " 틀린 문항은 오답 노트에 기록됩니다 엔터를 누르면 통계를 저장합니다...");
     }
 
+    /**
+     * 오답 노트를 기반으로 다시 푸는 퀴즈입니다.
+     */
     public void runIncorrectQuiz(Vector<IncorrectWord> incorrectWords){
         if(incorrectWords == null || incorrectWords.isEmpty()){
             System.out.println("기록된 오답이 없습니다.");
@@ -227,28 +264,31 @@ public class QuizManagement extends BaseMenu {
         scanner.nextLine();
     }
 
+    /**
+     * 오답 유형에 따라 적절한 퀴즈 함수를 호출합니다.
+     */
     private boolean askIncorrectQuestion(String quizType, int number, Word word){
         String type = quizType != null && !quizType.isEmpty() ? quizType : QUIZ_TYPE_ENG_KOR;
         switch (type){
             case QUIZ_TYPE_KOR_ENG -> {
-                return subKorEngQuiz(number, word);
+                return subSUBKorEngQuiz(number, word);
             }
             case QUIZ_TYPE_EXAMPLE -> {
                 if(word.getEx() == null || word.getEx().trim().isEmpty()){
                     System.out.println("예문 정보가 없어 해당 문제를 건너뜁니다.");
                     return true;
                 }
-                return subExampleQuiz(number, word);
+                return subSUBExampleQuiz(number, word);
             }
             case QUIZ_TYPE_SPELLING -> {
-                return subSpellingQuiz(number, word);
+                return subSUBSpellingQuiz(number, word);
             }
             case QUIZ_TYPE_ENG_KOR -> {
-                return subEngKorQuiz(number, word);
+                return subSUBEngKorQuiz(number, word);
             }
             default -> {
                 System.out.println("알 수 없는 퀴즈 유형입니다. 영어->뜻 퀴즈로 진행합니다.");
-                return subEngKorQuiz(number, word);
+                return subSUBEngKorQuiz(number, word);
             }
         }
     }
@@ -258,6 +298,7 @@ public class QuizManagement extends BaseMenu {
             waitConsole(scanner, "엔터를 누르면 이전 메뉴로 돌아갑니다...");
             return 0;
         }
+        // 퀴즈 문항 수를 안전하게 입력받습니다.
         while(true){
             int quizNumber = readInt(scanner, "원하시는 퀴즈 문항 수를 입력해주세요 : ");
             if(quizNumber <= 0){
@@ -269,6 +310,22 @@ public class QuizManagement extends BaseMenu {
                 return available;
             }
             return quizNumber;
+        }
+    }
+
+    /**
+     * 객관식/주관식 모드를 선택받습니다. 현재는 안내 후 주관식만 진행됩니다.
+     */
+    private int modeSelect(){
+        while(true){
+            System.out.println("퀴즈 모드를 선택하세요.");
+            System.out.println("1. 주관식");
+            System.out.println("2. 객관식 (준비 중)");
+            int mode = readInt(scanner, "모드를 선택해주세요 : ");
+            if(mode == MODE_SUBJECTIVE || mode == MODE_OBJECTIVE){
+                return mode;
+            }
+            System.out.println("1 또는 2를 입력해주세요.");
         }
     }
 
@@ -288,7 +345,7 @@ public class QuizManagement extends BaseMenu {
         return new ArrayList<>(list.subList(0, number));
     }
 
-    private boolean subSpellingQuiz(int number, Word word){
+    private boolean subSUBSpellingQuiz(int number, Word word){
         System.out.println();
         System.out.println((number+1)+"번 문제 ");
         String english = word.getEng();
@@ -329,7 +386,7 @@ public class QuizManagement extends BaseMenu {
         }
     }
 
-    private boolean subExampleQuiz(int number, Word word){
+    private boolean subSUBExampleQuiz(int number, Word word){
         System.out.println();
         System.out.println((number+1)+"번 문제 ");
         String example = word.getEx();
@@ -382,7 +439,7 @@ public class QuizManagement extends BaseMenu {
 
 
 
-    private boolean subEngKorQuiz(int number, Word word){
+    private boolean subSUBEngKorQuiz(int number, Word word){
         System.out.println();
         System.out.println((number+1)+"번 문제 ");
         String english = word.getEng();
@@ -438,7 +495,7 @@ public class QuizManagement extends BaseMenu {
         }
     }
 
-    private boolean subKorEngQuiz(int number, Word word){
+    private boolean subSUBKorEngQuiz(int number, Word word){
         System.out.println();
         System.out.println((number+1)+"번 문제 ");
         String[] korean = word.getKor();
@@ -569,4 +626,7 @@ public class QuizManagement extends BaseMenu {
         }
         return blank;
     }
+
+
+
 }
