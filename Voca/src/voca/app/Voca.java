@@ -32,12 +32,10 @@ public class Voca extends BaseMenu {
     }
 
     public void menu(String userId){
-        cleanConsole();
-        System.out.println(userId + "님의 단어장입니다.");
         int choice = 0;
-
         while(choice !=4) {
             cleanConsole();
+            System.out.println(userId + "님의 단어장입니다.");
             System.out.println("1) 퀴즈 2) 예문 관리 3) 단어장 출력 4) 종료");
             System.out.print("메뉴를 선택하세요 : ");
             choice = scanner.nextInt();
@@ -47,19 +45,13 @@ public class Voca extends BaseMenu {
                 case 1 -> quizManagement.menu();
                 case 2 -> ExampleManagement.ex_menu(scanner,voca);
                 case 3 -> {
-                    all_print();
+                    printWords(voca);
                     waitConsole(scanner);
                 }
                 case 4 ->System.out.println(userId + "님의 단어장을 종료합니다.\n");
             }
         }
         FileManagement.saveVoca(voca,filePath);
-    }
-
-    private void all_print() {
-        for(Word str : voca){
-            System.out.println(str);
-        }
     }
 
     private void ensureUserVocaExists(){

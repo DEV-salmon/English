@@ -1,12 +1,14 @@
 package voca.management;
 
 import java.util.Scanner;
+import java.util.Vector;
+
+import voca.core.Word;
 
 public class BaseMenu {
 
     protected static void cleanConsole() {
         System.out.print("\u001B[2J");
-        System.out.flush();
     }
 
     protected static void waitConsole(Scanner scanner) {
@@ -21,5 +23,15 @@ public class BaseMenu {
             System.out.print(message);
         }
         scanner.nextLine();
+    }
+
+    protected static void printWords(Vector<Word> voca) {
+        if(voca == null || voca.isEmpty()){
+            System.out.println("단어장이 비어있습니다.");
+            return;
+        }
+        for(Word word : voca){
+            System.out.println(word);
+        }
     }
 }

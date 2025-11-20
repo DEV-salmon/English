@@ -58,7 +58,7 @@ public class QuizManagement extends BaseMenu {
                     incorrectManagement.menu(scanner, this);
                 }
                 case 6 ->{
-                    System.out.println("\u001B[2J");
+                    cleanConsole();
                     return;
                 }
                 default -> System.out.println("다시 입력해주세요");

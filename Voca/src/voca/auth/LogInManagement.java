@@ -47,6 +47,7 @@ public class LogInManagement extends BaseMenu {
                 case 1-> registerUser();
                 case 2-> loginUser();
                 case 3 -> System.out.println("단어장 프로그램을 종료합니다.\n");
+                default -> {System.out.println("메뉴에 존재하지 않습니다. 다시 입력해주세요.");}
             }
         }
         FileManagement.saveLogin(loginList,loginFilePath);
