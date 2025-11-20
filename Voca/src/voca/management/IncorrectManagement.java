@@ -1,14 +1,7 @@
 package voca.management;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.HashSet;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.Vector;
+import java.io.*;
+import java.util.*;
 
 import voca.core.IncorrectWord;
 import voca.core.UserSession;
@@ -32,14 +25,16 @@ public class IncorrectManagement extends BaseMenu {
             System.out.println("===== 오답 메뉴 =====");
             System.out.println("1. 오답 퀴즈");
             System.out.println("2. 오답 초기화");
-            System.out.println("3. 되돌아가기");
+            System.out.println("3. 오답 노트 출력");
+            System.out.println("4. 되돌아가기");
             System.out.print("-> ");
             int choice = scanner.nextInt();
             scanner.nextLine();
             switch (choice){
                 case 1 -> quizManagement.runIncorrectQuiz(getIncorrectWordsSnapshot());
                 case 2 -> clearIncorrect(scanner);
-                case 3 -> {
+                case 3 -> printIncorrectNotes(scanner);
+                case 4 -> {
                     System.out.println("이전 메뉴로 돌아갑니다.");
                     return;
                 }
@@ -180,6 +175,35 @@ public class IncorrectManagement extends BaseMenu {
     private Vector<IncorrectWord> getIncorrectWordsSnapshot(){
         initializeIncorrectNotes();
         return new Vector<>(cachedIncorrectWords);
+    }
+
+    private void printIncorrectNotes(Scanner scanner){
+        initializeIncorrectNotes();
+        if(cachedIncorrectWords.isEmpty()){
+            System.out.println("기록된 오답이 없습니다.");
+            waitConsole(scanner, "엔터를 누르면 이전 메뉴로 돌아갑니다...");
+            return;
+        }
+
+        System.out.println("===== 기록된 오답 =====");
+        int index = 1;
+        for(IncorrectWord incorrectWord : cachedIncorrectWords){
+            String eng = safeString(incorrectWord.getEng());
+            String kor = safeString(String.join(", ", incorrectWord.getKor()));
+            String ex = safeString(incorrectWord.getEx());
+            String quizType = safeString(incorrectWord.getQuizType());
+            System.out.println(index+". "+eng);
+            System.out.println("   뜻 : "+kor);
+            if(!ex.isEmpty()){
+                System.out.println("   예문 : "+ex);
+            }
+            if(!quizType.isEmpty()){
+                System.out.println("   유형 : "+quizType);
+            }
+            index++;
+        }
+        System.out.println("=====================");
+        waitConsole(scanner, "엔터를 누르면 이전 메뉴로 돌아갑니다...");
     }
 
     private IncorrectWord buildIncorrectWord(String eng, String kor, String ex, String quizType){
