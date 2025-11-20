@@ -25,6 +25,24 @@ public class BaseMenu {
         scanner.nextLine();
     }
 
+    protected static int readInt(Scanner scanner, String str){
+        while(true){
+            if(str != null){
+                System.out.print(str);
+            }
+            String line = scanner.nextLine().trim();
+            if(line.isEmpty()){
+                System.out.println("숫자를 입력해주세요.");
+                continue;
+            }
+            try{
+                return Integer.parseInt(line);
+            } catch (Exception e){
+                System.out.println("숫자를 입력해주세요.");
+            }
+        }
+    }
+
     protected static void printWords(Vector<Word> voca) {
         if(voca == null || voca.isEmpty()){
             System.out.println("단어장이 비어있습니다.");

@@ -37,9 +37,7 @@ public class Voca extends BaseMenu {
             cleanConsole();
             System.out.println(userId + "님의 단어장입니다.");
             System.out.println("1) 퀴즈 2) 예문 관리 3) 단어장 출력 4) 종료");
-            System.out.print("메뉴를 선택하세요 : ");
-            choice = scanner.nextInt();
-            scanner.nextLine();
+            choice = readInt(scanner, "메뉴를 선택하세요 : ");
             System.out.println();
             switch (choice) {
                 case 1 -> quizManagement.menu();
@@ -49,6 +47,7 @@ public class Voca extends BaseMenu {
                     waitConsole(scanner);
                 }
                 case 4 ->System.out.println(userId + "님의 단어장을 종료합니다.\n");
+                default -> System.out.println("메뉴에 존재하지 않습니다. 다시 입력해주세요.");
             }
         }
         FileManagement.saveVoca(voca,filePath);

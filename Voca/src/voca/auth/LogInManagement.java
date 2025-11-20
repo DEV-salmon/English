@@ -39,15 +39,13 @@ public class LogInManagement extends BaseMenu {
         while(choice !=3) {
             cleanConsole();
             System.out.println("1) 회원가입 2) 로그인 3) 종료");
-            System.out.print("메뉴를 선택하세요 : ");
-            choice = scanner.nextInt();
-            scanner.nextLine();
+            choice = readInt(scanner, "메뉴를 선택하세요 : ");
             System.out.println();
             switch (choice) {
                 case 1-> registerUser();
                 case 2-> loginUser();
                 case 3 -> System.out.println("단어장 프로그램을 종료합니다.\n");
-                default -> {System.out.println("메뉴에 존재하지 않습니다. 다시 입력해주세요.");}
+                default -> System.out.println("메뉴에 존재하지 않습니다. 다시 입력해주세요.");
             }
         }
         FileManagement.saveLogin(loginList,loginFilePath);

@@ -39,8 +39,7 @@ public class QuizManagement extends BaseMenu {
             System.out.println("4. 스펠링 퀴즈");
             System.out.println("5. 오답 메뉴");
             System.out.println("6. 뒤로가기");
-            System.out.print("원하시는 항목 번호를 입력해주세요 -> ");
-            int menuNum = scanner.nextInt();
+            int menuNum = readInt(scanner, "원하시는 항목 번호를 입력해주세요 -> ");
             switch (menuNum) {
                 case 1 ->{
                     korEngQuiz();
@@ -61,7 +60,7 @@ public class QuizManagement extends BaseMenu {
                     cleanConsole();
                     return;
                 }
-                default -> System.out.println("다시 입력해주세요");
+                default -> System.out.println("메뉴에 존재하지 않습니다. 다시 입력해주세요.");
             }
             cleanConsole();
         }
@@ -170,9 +169,7 @@ public class QuizManagement extends BaseMenu {
         System.out.println("[예문 빈칸 퀴즈]");
         System.out.println("정답 또는 /hint, /speak 를 입력해주세요.");
         System.out.println("예문이 없는 단어는 자동으로 제외됩니다.");
-        System.out.print("원하시는 퀴즈 문항 수를 입력해주세요 : ");
-        int quizNumber=scanner.nextInt();
-        scanner.nextLine();
+        int quizNumber = readInt(scanner, "원하시는 퀴즈 문항 수를 입력해주세요 : ");
         if(quizNumber <= 0){
             System.out.println("1 이상의 문항 수를 입력해주세요. 메뉴로 돌아갑니다.");
             return;
@@ -250,6 +247,7 @@ public class QuizManagement extends BaseMenu {
                 return subEngKorQuiz(number, word);
             }
             default -> {
+                System.out.println("알 수 없는 퀴즈 유형입니다. 영어->뜻 퀴즈로 진행합니다.");
                 return subEngKorQuiz(number, word);
             }
         }
@@ -257,19 +255,11 @@ public class QuizManagement extends BaseMenu {
     private int requestQuizCount(int available){
         if(available <= 0){
             System.out.println("등록된 단어가 없어 퀴즈를 진행할 수 없습니다.");
-            System.out.print("엔터를 누르면 이전 메뉴로 돌아갑니다...");
-            scanner.nextLine();
+            waitConsole(scanner, "엔터를 누르면 이전 메뉴로 돌아갑니다...");
             return 0;
         }
         while(true){
-            System.out.print("원하시는 퀴즈 문항 수를 입력해주세요 : ");
-            if(!scanner.hasNextInt()){
-                System.out.println("숫자를 입력해주세요.");
-                scanner.nextLine();
-                continue;
-            }
-            int quizNumber = scanner.nextInt();
-            scanner.nextLine();
+            int quizNumber = readInt(scanner, "원하시는 퀴즈 문항 수를 입력해주세요 : ");
             if(quizNumber <= 0){
                 System.out.println("1 이상의 문항 수를 입력해주세요.");
                 continue;

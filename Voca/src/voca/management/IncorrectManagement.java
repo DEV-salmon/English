@@ -28,8 +28,7 @@ public class IncorrectManagement extends BaseMenu {
             System.out.println("3. 오답 노트 출력");
             System.out.println("4. 되돌아가기");
             System.out.print("-> ");
-            int choice = scanner.nextInt();
-            scanner.nextLine();
+            int choice = readInt(scanner, "");
             switch (choice){
                 case 1 -> quizManagement.runIncorrectQuiz(getIncorrectWordsSnapshot());
                 case 2 -> clearIncorrect(scanner);

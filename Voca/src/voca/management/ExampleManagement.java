@@ -13,9 +13,7 @@ public class ExampleManagement extends BaseMenu{
         while(choice !=4) {
             cleanConsole();
             System.out.println("1) 에문 추가 2) 예문 삭제 3) 예문 수정 4) 종료");
-            System.out.print("메뉴를 선택하세요 : ");
-            choice = scanner.nextInt();
-            scanner.nextLine();
+            choice = readInt(scanner, "메뉴를 선택하세요 : ");
             System.out.println();
             switch (choice) {
                 case 1-> {
@@ -34,6 +32,7 @@ public class ExampleManagement extends BaseMenu{
                     System.out.println("예문 관리 메뉴를 종료합니다.");
                     waitConsole(scanner);
                 }
+                default -> System.out.println("다시 입력해주세요");
             }
         }
     }
