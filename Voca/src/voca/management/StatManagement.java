@@ -1,18 +1,21 @@
 package voca.management;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.File;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
+import java.util.Scanner;
 
-import voca.core.UserSession;
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
-public class StatManagement {
+import voca.core.UserSession;
+
+public class StatManagement extends BaseMenu {
 
     private final String statFilePath;
 
@@ -72,7 +75,13 @@ public class StatManagement {
 
     public void saveStatToFile() {
 
-        try (FileWriter fw = new FileWriter(statFilePath)) {
+        File statFile = new File(statFilePath);
+        File parent = statFile.getParentFile();
+        if (parent != null && !parent.exists()) {
+            parent.mkdirs();
+        }
+
+        try (FileWriter fw = new FileWriter(statFile)) {
 
             fw.write("===== 통계 =====\n\n");
 
@@ -143,10 +152,20 @@ public class StatManagement {
             File dir = txtFile.getParentFile();
             File chartFile = new File(dir, "stat.png");
 
-            ChartUtils.saveChartAsPNG(chartFile, chart, 800, 600);
+            BufferedImage image = chart.createBufferedImage(800, 600);
+            ImageIO.write(image, "png", chartFile);
 
         } catch (IOException e) {
             System.out.println("그래프 저장 오류: " + e.getMessage());
         }
+    }
+
+    public void saveStatToFileWithWait(Scanner scanner, String waitMessage) {
+        waitConsole(scanner, waitMessage);
+        saveStatToFile();
+    }
+
+    public void saveStatToFileWithWait(Scanner scanner) {
+        saveStatToFileWithWait(scanner, "엔터를 누르면 통계를 저장합니다...");
     }
 }

@@ -10,9 +10,10 @@ import java.util.Vector;
 import voca.app.Voca;
 import voca.core.UserSession;
 import voca.core.Word;
+import voca.management.BaseMenu;
 import voca.management.FileManagement;
 
-public class LogInManagement {
+public class LogInManagement extends BaseMenu {
     private final Vector<Login> loginList;
     private static final Scanner scanner = new Scanner(System.in);
     private final String loginFilePath;
@@ -36,6 +37,7 @@ public class LogInManagement {
         int choice = 0;
 
         while(choice !=3) {
+            cleanConsole();
             System.out.println("1) 회원가입 2) 로그인 3) 종료");
             System.out.print("메뉴를 선택하세요 : ");
             choice = scanner.nextInt();
@@ -44,7 +46,7 @@ public class LogInManagement {
             switch (choice) {
                 case 1-> registerUser();
                 case 2-> loginUser();
-                case 3 ->System.out.println("단어장 프로그램을 종료합니다.\n");
+                case 3 -> System.out.println("단어장 프로그램을 종료합니다.\n");
             }
         }
         FileManagement.saveLogin(loginList,loginFilePath);
@@ -107,6 +109,7 @@ public class LogInManagement {
             for(Login login : loginList) {
                 if (login.getUserid().equals(suserId)){
                     System.out.println("중복되는 아이디입니다.\n");
+                    waitConsole(scanner);
                     return;
                 }
             }
@@ -127,9 +130,11 @@ public class LogInManagement {
             System.out.println("회원가입이 완료 완료되었습니다.\n");
 
             initializeUserVocaFile(suserId);
+            waitConsole(scanner);
 
         }catch (NoSuchAlgorithmException e) {
             System.out.println("알고리즘을 찾을 수 없습니다.\n");
+            waitConsole(scanner);
         }
 
     }
@@ -142,6 +147,7 @@ public class LogInManagement {
     private void loginUser() {
         if(loginList.isEmpty()){
             System.out.println("회원가입이 된 아이디가 없습니다.\n");
+            waitConsole(scanner);
             return;
         }
         try{
@@ -164,13 +170,16 @@ public class LogInManagement {
                         return;
                     }else {
                         System.out.println("비밀번호가 일치 하지 않습니다.\n");
+                        waitConsole(scanner);
                         return;
                     }
                 }
             }
             System.out.println("아이디가 존재하지 않습니다.\n");
+            waitConsole(scanner);
         } catch (NoSuchAlgorithmException e) {
             System.out.println("알고리즘을 찾을 수 없습니다.\n");
+            waitConsole(scanner);
         }
     }
     private void initializeUserVocaFile(String userId){

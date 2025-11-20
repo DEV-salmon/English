@@ -6,19 +6,21 @@ import voca.core.IncorrectWord;
 import voca.core.UserSession;
 import voca.core.Word;
 
-public class QuizManagement {
+public class QuizManagement extends BaseMenu {
     private static final String QUIZ_TYPE_KOR_ENG = "KOR_ENG";
     private static final String QUIZ_TYPE_ENG_KOR = "ENG_KOR";
     private static final String QUIZ_TYPE_EXAMPLE = "EXAMPLE";
     private static final String QUIZ_TYPE_SPELLING = "SPELLING";
     private final Vector<Word> words;
     private final IncorrectManagement incorrectManagement;
+    private final StatManagement statManagement;
     private final Scanner scanner = new Scanner(System.in);
     private static int hintCount = 0;
 
     public QuizManagement(Vector<Word> words, UserSession session){
         this.words = words;
         this.incorrectManagement = new IncorrectManagement(session);
+        this.statManagement = new StatManagement(session);
     }
 
     public void menu(){
@@ -79,17 +81,19 @@ public class QuizManagement {
         List<Integer> list =pickN(words.size(),quizNumber);
         for(int i=0;i<list.size();i++){
             Word word = words.get(list.get(i));
-            if(subKorEngQuiz(i, word)){
+            boolean correct = subKorEngQuiz(i, word);
+            if(correct){
                 score++;
+                statManagement.addKorEngCorrect();
             }
             else{
                 incorrectManagement.recordIncorrect(word, QUIZ_TYPE_KOR_ENG);
+                statManagement.addKorEngWrong();
             }
         }
         System.out.println("힌트 사용 횟수 : "+hintCount);
         System.out.println("점수 : "+ score);
-        System.out.print(" 틀린 문항은 오답 노트에 기록됩니다 엔터를 눌러주세요...");
-        scanner.nextLine();
+        statManagement.saveStatToFileWithWait(scanner, " 틀린 문항은 오답 노트에 기록됩니다 엔터를 누르면 통계를 저장합니다...");
     }
     public void engKorQuiz(){
         hintCount=0;
@@ -104,17 +108,19 @@ public class QuizManagement {
         List<Integer> list =pickN(words.size(),quizNumber);
         for(int i=0;i<list.size();i++){
             Word word = words.get(list.get(i));
-            if(subEngKorQuiz(i, word)){
+            boolean correct = subEngKorQuiz(i, word);
+            if(correct){
                 score++;
+                statManagement.addEngKorCorrect();
             }
             else{
                 incorrectManagement.recordIncorrect(word, QUIZ_TYPE_ENG_KOR);
+                statManagement.addEngKorWrong();
             }
         }
         System.out.println("힌트 사용 횟수 : "+hintCount);
         System.out.println("점수 : "+ score);
-        System.out.print(" 틀린 문항은 오답 노트에 기록됩니다 엔터를 눌러주세요...");
-        scanner.nextLine();
+        statManagement.saveStatToFileWithWait(scanner, " 틀린 문항은 오답 노트에 기록됩니다 엔터를 누르면 통계를 저장합니다...");
     }
 
     public void spellingQuiz(){
@@ -130,17 +136,19 @@ public class QuizManagement {
         List<Integer> list =pickN(words.size(),quizNumber);
         for(int i=0;i<list.size();i++){
             Word word = words.get(list.get(i));
-            if(subSpellingQuiz(i, word)){
+            boolean correct = subSpellingQuiz(i, word);
+            if(correct){
                 score++;
+                statManagement.addSpellingCorrect();
             }
             else{
                 incorrectManagement.recordIncorrect(word, QUIZ_TYPE_SPELLING);
+                statManagement.addSpellingWrong();
             }
         }
         System.out.println("힌트 사용 횟수 : "+hintCount);
         System.out.println("점수 : "+ score);
-        System.out.print(" 틀린 문항은 오답 노트에 기록됩니다 엔터를 눌러주세요...");
-        scanner.nextLine();
+        statManagement.saveStatToFileWithWait(scanner, " 틀린 문항은 오답 노트에 기록됩니다 엔터를 누르면 통계를 저장합니다...");
     }
 
     public void exampleQuiz(){
@@ -153,8 +161,7 @@ public class QuizManagement {
         }
         if(exampleIndices.isEmpty()){
             System.out.println("예문이 등록된 단어가 없습니다. 예문 관리에서 먼저 예문을 추가해주세요.");
-            System.out.print("엔터를 누르면 메뉴로 돌아갑니다...");
-            scanner.nextLine();
+            waitConsole(scanner, "엔터를 누르면 메뉴로 돌아갑니다...");
             return;
         }
 
@@ -177,24 +184,25 @@ public class QuizManagement {
         Collections.shuffle(exampleIndices);
         for(int i=0;i<quizNumber;i++){
             Word word = words.get(exampleIndices.get(i));
-            if(subExampleQuiz(i, word)){
+            boolean correct = subExampleQuiz(i, word);
+            if(correct){
                 score++;
+                statManagement.addExampleCorrect();
             }
             else{
                 incorrectManagement.recordIncorrect(word, QUIZ_TYPE_EXAMPLE);
+                statManagement.addExampleWrong();
             }
         }
         System.out.println("힌트 사용 횟수 : "+hintCount);
         System.out.println("점수 : "+ score);
-        System.out.print(" 틀린 문항은 오답 노트에 기록됩니다 엔터를 눌러주세요...");
-        scanner.nextLine();
+        statManagement.saveStatToFileWithWait(scanner, " 틀린 문항은 오답 노트에 기록됩니다 엔터를 누르면 통계를 저장합니다...");
     }
 
     public void runIncorrectQuiz(Vector<IncorrectWord> incorrectWords){
         if(incorrectWords == null || incorrectWords.isEmpty()){
             System.out.println("기록된 오답이 없습니다.");
-            System.out.print("엔터를 누르면 이전 메뉴로 돌아갑니다...");
-            scanner.nextLine();
+            waitConsole(scanner, "엔터를 누르면 이전 메뉴로 돌아갑니다...");
             return;
         }
         hintCount=0;
@@ -570,8 +578,5 @@ public class QuizManagement {
             blank += "_";
         }
         return blank;
-    }
-    private static void cleanConsole(){
-        System.out.println("\u001B[2J");
     }
 }

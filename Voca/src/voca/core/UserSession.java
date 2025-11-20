@@ -27,6 +27,10 @@ public class UserSession {
         return userDirectory + "/Incorrect.txt";
     }
 
+    public String getStatFilePath() {
+        return userDirectory + "/stat.txt";
+    }
+
     public String resolveInUserDirectory(String relativePath) {
         if(relativePath == null || relativePath.isEmpty()){
             return userDirectory;

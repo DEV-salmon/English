@@ -14,7 +14,7 @@ import voca.core.IncorrectWord;
 import voca.core.UserSession;
 import voca.core.Word;
 
-public class IncorrectManagement {
+public class IncorrectManagement extends BaseMenu {
     private final String incorrectFilePath;
     private final Vector<IncorrectWord> cachedIncorrectWords = new Vector<>();
     private final Set<String> incorrectWordKeys = new HashSet<>();
@@ -102,8 +102,7 @@ public class IncorrectManagement {
         try(PrintWriter writer = new PrintWriter(new FileWriter(incorrectFilePath))){
             writer.print("");
             System.out.println("오답 노트를 초기화했습니다.");
-            System.out.print("엔터를 누르면 이전 메뉴로 돌아갑니다...");
-            scanner.nextLine();
+            waitConsole(scanner, "엔터를 누르면 이전 메뉴로 돌아갑니다...");
             cachedIncorrectWords.clear();
             incorrectWordKeys.clear();
             cacheInitialized = true;
@@ -240,8 +239,5 @@ public class IncorrectManagement {
             return "";
         }
         return value;
-    }
-    private static void cleanConsole(){
-        System.out.println("\u001B[2J");
     }
 }
