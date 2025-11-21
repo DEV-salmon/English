@@ -13,7 +13,7 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
-import voca.core.UserSession;
+import voca.core.*;
 
 public class StatManagement extends BaseMenu {
 
@@ -31,7 +31,7 @@ public class StatManagement extends BaseMenu {
     private int spelling_correct;
     private int spelling_wrong;
 
-    public StatManagement(UserSession session) {
+    public StatManagement(UserFileInfo session) {
         this.statFilePath = session.getStatFilePath();
     }
 

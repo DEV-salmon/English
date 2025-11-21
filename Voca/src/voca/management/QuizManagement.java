@@ -2,8 +2,7 @@ package voca.management;
 
 import java.util.*;
 
-import voca.core.IncorrectWord;
-import voca.core.UserSession;
+import voca.core.*;
 import voca.core.Word;
 
 import static java.lang.Integer.parseInt;
@@ -28,7 +27,7 @@ public class QuizManagement extends BaseMenu {
      * @param words : 유저의 보카 파일을 받는다
      * @param session: 로그인한 유저의 보카 파일 경로를 전달하기 위해 필요하다
      */
-    public QuizManagement(Vector<Word> words, UserSession session){
+    public QuizManagement(Vector<Word> words, UserFileInfo session){
         this.words = words;
         this.incorrectManagement = new IncorrectManagement(session);
         this.statManagement = new StatManagement(session);

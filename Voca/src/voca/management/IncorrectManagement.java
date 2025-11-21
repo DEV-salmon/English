@@ -3,8 +3,7 @@ package voca.management;
 import java.io.*;
 import java.util.*;
 
-import voca.core.IncorrectWord;
-import voca.core.UserSession;
+import voca.core.*;
 import voca.core.Word;
 
 public class IncorrectManagement extends BaseMenu {
@@ -12,7 +11,7 @@ public class IncorrectManagement extends BaseMenu {
     private final Vector<IncorrectWord> notes = new Vector<>();
     private final Set<String> noteKeys = new HashSet<>();
 
-    public IncorrectManagement(UserSession session){
+    public IncorrectManagement(UserFileInfo session){
         this.incorrectFilePath = session.getIncorrectFilePath();
         ensureFile();
     }
