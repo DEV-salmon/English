@@ -8,11 +8,15 @@ import java.util.Scanner;
 import java.util.Vector;
 
 import voca.app.Voca;
-import voca.core.UserSession;
+import voca.core.UserFileInfo;
 import voca.core.Word;
 import voca.management.BaseMenu;
 import voca.management.FileManagement;
 
+/**
+ * 전반적인 로그인기능을 관리하는 클래스입니다
+ * 암호에 무작위 salt를 덧붙여 해시화하여 보안을 강화합니다.
+ */
 public class LogInManagement extends BaseMenu {
     private final Vector<Login> loginList;
     private static final Scanner scanner = new Scanner(System.in);
@@ -159,8 +163,8 @@ public class LogInManagement extends BaseMenu {
                     String hashedInput = PasswordUtil.hashPassword(ppw, login.getSalt());
                     if(login.getHashedpassword().equals(hashedInput)){
                         System.out.println("로그인이 완료되었습니다.\n");
-                        UserSession session = new UserSession(login.getUserid(), USER_VOCA_DIR);
-                        Voca voca = new Voca(session);
+                        UserFileInfo userInfo = new UserFileInfo(login.getUserid(), USER_VOCA_DIR);
+                        Voca voca = new Voca(userInfo);
                         voca.menu(login.getUserid());
                         return;
                     }else {
@@ -178,13 +182,13 @@ public class LogInManagement extends BaseMenu {
         }
     }
     private void initializeUserVocaFile(String userId){
-        UserSession session = new UserSession(userId, USER_VOCA_DIR);
-        String directoryPath = session.getUserDirectory();
+        UserFileInfo userInfo = new UserFileInfo(userId, USER_VOCA_DIR);
+        String directoryPath = userInfo.getUserDirectory();
         File directory = new File(directoryPath);
         if(!directory.exists()){
             directory.mkdirs();
         }
-        String filePath = session.getVocaFilePath();
+        String filePath = userInfo.getVocaFilePath();
         File file = new File(filePath);
         File parent = file.getParentFile();
         if(parent != null && !parent.exists()){

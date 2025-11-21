@@ -11,8 +11,12 @@ public class IncorrectManagement extends BaseMenu {
     private final Vector<IncorrectWord> notes = new Vector<>();
     private final Set<String> noteKeys = new HashSet<>();
 
-    public IncorrectManagement(UserFileInfo session){
-        this.incorrectFilePath = session.getIncorrectFilePath();
+    /**
+     * 오답 관리자를 초기화합니다.
+     * @param userInfo 파일 경로 정보를 담은 사용자 정보
+     */
+    public IncorrectManagement(UserFileInfo userInfo){
+        this.incorrectFilePath = userInfo.getIncorrectFilePath();
         ensureFile();
     }
 
@@ -71,6 +75,9 @@ public class IncorrectManagement extends BaseMenu {
         }
     }
 
+    /**
+     * 맞춘 단어를 오답 목록에서 제거하고 파일을 갱신합니다.
+     */
     public void markCorrect(IncorrectWord word){
         if(word == null){
             return;
@@ -111,6 +118,9 @@ public class IncorrectManagement extends BaseMenu {
         }
     }
 
+    /**
+     * 오답 노트 파일을 파싱하여 메모리 목록을 생성합니다.
+     */
     private Vector<IncorrectWord> parseIncorrectWords(){
         Vector<IncorrectWord> incorrectWords = new Vector<>();
         try(Scanner sc = new Scanner(new File(incorrectFilePath))){
@@ -182,6 +192,9 @@ public class IncorrectManagement extends BaseMenu {
         }
     }
 
+    /**
+     * 현 시점의 오답 목록 스냅샷을 반환합니다.
+     */
     private Vector<IncorrectWord> getIncorrectWordsSnapshot(){
         initializeIncorrectNotes();
         return new Vector<>(notes);
@@ -219,6 +232,9 @@ public class IncorrectManagement extends BaseMenu {
         waitConsole(scanner, "엔터를 누르면 이전 메뉴로 돌아갑니다...");
     }
 
+    /**
+     * 주어진 정보를 기반으로 IncorrectWord 객체를 생성합니다.
+     */
     private IncorrectWord buildIncorrectWord(String eng, String kor, String ex, String quizType){
         String[] korArray = parseKor(kor);
         if(ex != null && !ex.isEmpty()){
@@ -227,6 +243,9 @@ public class IncorrectManagement extends BaseMenu {
         return new IncorrectWord(eng, korArray, quizType);
     }
 
+    /**
+     * 쉼표로 구분된 한국어 뜻을 배열로 변환합니다.
+     */
     private String[] parseKor(String korRaw){
         if(korRaw == null || korRaw.trim().isEmpty()){
             return new String[]{""};
@@ -257,10 +276,16 @@ public class IncorrectManagement extends BaseMenu {
         return normalizedEng + "|" + normalizedKor + "|" + normalizedEx + "|" + normalizedType;
     }
 
+    /**
+     * 파일에 저장할 오답 노트 한 줄을 탭으로 구분해 만듭니다.
+     */
     private String formatLine(String eng, String kor, String ex, String quizType){
         return safeString(eng) + "\t" + safeString(kor) + "\t" + safeString(ex) + "\t" + safeString(quizType);
     }
 
+    /**
+     * 오답 노트 파일을 준비합니다. 없으면 생성하고, 상위 폴더도 만듭니다.
+     */
     private void ensureFile(){
         try{
             File file = new File(incorrectFilePath);
@@ -277,6 +302,9 @@ public class IncorrectManagement extends BaseMenu {
         }
     }
 
+    /**
+     * 널/공백 안전한 문자열을 반환합니다.
+     */
     private static String safeString(String value){
         if(value == null){
             return "";

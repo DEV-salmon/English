@@ -4,16 +4,13 @@ import java.io.File;
 import java.util.Scanner;
 import java.util.Vector;
 
-import voca.core.UserSession;
+import voca.core.UserFileInfo;
 import voca.core.Word;
-import voca.management.BaseMenu;
-import voca.management.ExampleManagement;
-import voca.management.FileMenu;
-import voca.management.FileManagement;
-import voca.management.QuizManagement;
-import voca.management.StatManagement;
-import voca.management.WordManagement;
-
+import voca.management.*;
+/**
+ * 영어단어장 프로그램의 핵심 클래스입니다
+ * LoginManagement를 통해 UserFileInfo를 받아와 유저를 폴더별로 관리합니다
+ */
 public class Voca extends BaseMenu {
     private static final String DEFAULT_VOCA_PATH = "Voca/src/res/voca";
     private final Vector<Word> voca;
@@ -23,23 +20,34 @@ public class Voca extends BaseMenu {
     private final WordManagement wordManagement;
     private final FileMenu fileMenu;
     private final StatManagement statManagement;
-    private final UserSession session;
+    private final UserFileInfo userInfo;
 
-    public Voca(UserSession session){
-        this.session = session;
-        this.filePath = session.getVocaFilePath();
+    /**
+     * 생성자입니다
+     * 보카 파일이 비어있다면, 기본 보카를 호출합니다
+     * 보카 파일을 파일 경로를 받아 파싱합니다
+     * Quiz, 단어, 파일, 통계관련 클래스의 객체를 생성합니다
+     * @param userInfo : 사용자별 보카 관리를 위해 필요한 파라미터입니다
+     */
+    public Voca(UserFileInfo userInfo){
+        this.userInfo = userInfo;
+        this.filePath = userInfo.getVocaFilePath();
         ensureUserVocaExists();
         this.voca = FileManagement.makeVoca(filePath);
         if(this.voca.isEmpty()){
             loadDefaultIntoUserFile();
             this.voca.addAll(FileManagement.makeVoca(filePath));
         }
-        this.quizManagement = new QuizManagement(this.voca, session);
+        this.quizManagement = new QuizManagement(this.voca, userInfo);
         this.wordManagement = new WordManagement(scanner, this.voca);
         this.fileMenu = new FileMenu(scanner, this.voca, filePath);
         this.statManagement = quizManagement.getStatManagement();
     }
 
+    /**
+     * 메뉴입니다
+     * @param userId
+     */
     public void menu(String userId){
         int choice = 0;
         while(choice !=7) {
@@ -65,8 +73,11 @@ public class Voca extends BaseMenu {
         FileManagement.saveVoca(voca,filePath);
     }
 
+    /**
+     * 유저의 보카 파일의 존재여부를 확인하는 매서드입니다
+     */
     private void ensureUserVocaExists(){
-        String userDirectory = session.getUserDirectory();
+        String userDirectory = userInfo.getUserDirectory();
         File userDir = new File(userDirectory);
         if(!userDir.exists()){
             userDir.mkdirs();
@@ -77,6 +88,9 @@ public class Voca extends BaseMenu {
         }
     }
 
+    /**
+     * 유저의 보카파일이 없는 것을 대비해 기본보카를 불러오는 메서드입니다
+     */
     private void loadDefaultIntoUserFile(){
         Vector<Word> defaultVoca = FileManagement.makeVoca(DEFAULT_VOCA_PATH);
         FileManagement.saveVoca(new Vector<>(defaultVoca), filePath);

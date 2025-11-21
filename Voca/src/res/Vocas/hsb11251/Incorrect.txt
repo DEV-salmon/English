@@ -1,0 +1,3 @@
+instead of	～대신에		KOR_ENG
+legal	합법적인		ENG_KOR
+instead of	～대신에		ENG_KOR

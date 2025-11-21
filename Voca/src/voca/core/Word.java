@@ -2,11 +2,20 @@ package voca.core;
 
 import voca.tts.TTS;
 
+/**
+ * 단어를 정의한 클래스입니다
+ */
 public class Word {
     private String eng;
     private String[] kor;
     private String ex="";
 
+    /**
+     * 생성자입니다
+     * 영어, 한국어뜻을 받습니다. 이때, 예문은 선택적으로 받습니다.
+     * @param eng
+     * @param kor
+     */
     public Word(String eng, String[] kor){
         this.eng = eng;
         this.kor = kor;
@@ -63,6 +72,10 @@ public class Word {
         return ((ex != null && !ex.isEmpty()) ? eng_kor_ex_String : eng_kor_String) + "\n"+"-".repeat(20);
     }
 
+
+    /**
+     * @return 단어의 예문 구현여부를 반환합니다.
+     */
     public boolean haveEx(){
         if (getEx()==null){
             return false;

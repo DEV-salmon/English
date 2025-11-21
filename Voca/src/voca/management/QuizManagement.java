@@ -24,13 +24,13 @@ public class QuizManagement extends BaseMenu {
 
     /**
      * 생성자
-     * @param words : 유저의 보카 파일을 받는다
-     * @param session: 로그인한 유저의 보카 파일 경로를 전달하기 위해 필요하다
+     * @param words: 유저의 보카 파일을 받는다
+     * @param userInfo: 로그인한 유저의 보카 파일 경로를 전달하기 위해 필요하다
      */
-    public QuizManagement(Vector<Word> words, UserFileInfo session){
+    public QuizManagement(Vector<Word> words, UserFileInfo userInfo){
         this.words = words;
-        this.incorrectManagement = new IncorrectManagement(session);
-        this.statManagement = new StatManagement(session);
+        this.incorrectManagement = new IncorrectManagement(userInfo);
+        this.statManagement = new StatManagement(userInfo);
     }
 
     public StatManagement getStatManagement(){
@@ -493,8 +493,8 @@ public class QuizManagement extends BaseMenu {
 
     /**
      * 스펠링 주관식 한 문제를 묻습니다.
-     * @param number : 문제 번호(0부터 시작)
-     * @param word   : 현재 단어 객체
+     * @param number: 문제 번호(0부터 시작)
+     * @param word: 현재 단어 객체
      * @return 정답이면 true, 틀리면 false
      */
     private boolean subSUBSpellingQuiz(int number, Word word){
