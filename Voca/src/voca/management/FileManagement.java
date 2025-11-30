@@ -25,22 +25,27 @@ public class FileManagement {
                 String[] kor;
                 String ex;
                 String line=sc.nextLine();
-                String[] engKorEx = line.split("\t");
+                String[] engKorEx = line.split("\\t+| {2,}", -1);
+                if(engKorEx.length < 2){
+                    engKorEx = line.split("\t",-1);
+                }
+                if(engKorEx.length < 2){
+                    System.out.println(number+"번째 줄의 형식이 잘못되었습니다. (영어<TAB>한글<TAB>예문)");
+                    continue;
+                }
                 eng = engKorEx[0].trim();
                 kor = engKorEx[1].split(",");
                 for (int i = 0; i < kor.length; i++) {
                     kor[i] = kor[i].trim();
                 }
-                if(engKorEx.length==3){
+                ex = "";
+                if(engKorEx.length >= 3){
                     ex = engKorEx[2].trim();
-                    v.add(new Word(eng, kor, ex));
                 }
-                else if(engKorEx.length==2){
+                if(ex.isEmpty()){
                     v.add(new Word(eng, kor));
-                }
-                else{
-                    System.out.println(number+"의 단어의 형식이 잘못되었습니다. \n 형식 오류는 다른 단어에 영향을 끼칠 수 있으니 다시 한 번 확인해주세요.");
-                    System.out.println();
+                } else {
+                    v.add(new Word(eng, kor, ex));
                 }
             }
         }

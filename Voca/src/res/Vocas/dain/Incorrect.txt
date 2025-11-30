@@ -1,0 +1,4 @@
+train	기차, 훈련시키다		SPELLING
+intelligence	지식		SPELLING
+inheritance	유전, 유산		SPELLING
+religion	종교		SPELLING

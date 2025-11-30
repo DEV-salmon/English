@@ -240,7 +240,7 @@ public class FileMenu extends BaseMenu{
     }
 
     /**
-     * 단어장 파일 형식을 간단히 검사합니다.
+     * 단어장 파일 형식을 간단히 검사합니다. (예문은 없어도 됩니다)
      */
     private boolean validateVocaFormat(String path){
         try(Scanner sc = new Scanner(new File(path))){
@@ -252,7 +252,10 @@ public class FileMenu extends BaseMenu{
                 if(line.trim().isEmpty()){
                     continue;
                 }
-                String[] parts = line.split("\t",-1);
+                String[] parts = line.split("\\t+| {2,}", -1);
+                if(parts.length < 2){
+                    parts = line.split("\t",-1);
+                }
                 if(parts.length < 2 || parts.length > 3 || parts[0].trim().isEmpty() || parts[1].trim().isEmpty()){
                     System.out.println(lineNo + "번째 줄 형식이 잘못되었습니다. (영어<TAB>한글<TAB>예문)");
                     hasError = true;
