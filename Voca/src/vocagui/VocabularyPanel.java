@@ -1,3 +1,7 @@
+package vocagui;
+
+import vocagui.core.UserFileInfo;
+
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;

@@ -1,3 +1,7 @@
+package vocagui.login;
+
+import vocagui.core.UserFileInfo;
+
 public class LoginResult {
     private final boolean success;
     private final String message;

@@ -1,3 +1,7 @@
+package vocagui;
+
+import vocagui.core.UserFileInfo;
+
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;

@@ -1,9 +1,8 @@
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
+package vocagui.login;
+
+import vocagui.core.UserFileInfo;
+
+import javax.swing.*;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -73,7 +72,7 @@ public class LoginPanel extends JPanel {
 
     private void doLogin(boolean isRegister){
         String userId = userIdField.getText();
-        char[] password = passwordField.getPassword();
+        String password = Arrays.toString(passwordField.getPassword());
         try{
             LoginResult result = isRegister
                 ? loginManager.register(userId, password)
@@ -83,12 +82,19 @@ public class LoginPanel extends JPanel {
                 onLoginSuccess.accept(result.getSession());
             }
         }finally {
-            Arrays.fill(password, '\0');
+            Arrays.fill(password.toCharArray(), '\0');
         }
     }
 
     private void setStatus(String message, boolean success){
         statusLabel.setForeground(success ? new Color(0x1D7A1D) : new Color(0xB22222));
         statusLabel.setText(message);
+    }
+
+    public void resetStatus(String message) {
+        statusLabel.setForeground(new Color(0x444444)); // 초기 색상으로 가정
+        statusLabel.setText(message);
+        userIdField.setText(null);
+        passwordField.setText(null);
     }
 }

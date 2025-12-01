@@ -1,3 +1,10 @@
+package vocagui;
+
+import voca.auth.LogInManagement;
+import vocagui.core.UserFileInfo;
+import vocagui.login.LoginManager;
+import vocagui.login.LoginPanel;
+
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -9,7 +16,8 @@ public class BaseApp extends JFrame{
     private final CardLayout viewLayout = new CardLayout();
     private final JPanel viewContainer = new JPanel(viewLayout);
     private final FileManager fileManager = new FileManager();
-    private final LoginManager loginManager = new LoginManager(fileManager);
+    private final LoginManager loginManager = new LoginManager("Voca/src/res/LoginList",fileManager);
+    private LoginPanel loginPanel;
     private final QuizManager quizManager = new QuizManager();
     private final StatManager statManager = new StatManager();
     private final IncorrectManager incorrectManager = new IncorrectManager();
@@ -17,7 +25,7 @@ public class BaseApp extends JFrame{
 
     BaseApp(){
         //제목
-        super("Voca GUI");
+        super("2조 단어장");
         //
         setLayout(new BorderLayout());
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -25,7 +33,7 @@ public class BaseApp extends JFrame{
         setIconImage(loadLogo());
         setLocationRelativeTo(null);
 
-        LoginPanel loginPanel = new LoginPanel(loginManager, this::handleLoginSuccess);
+        this.loginPanel = new LoginPanel(loginManager, this::handleLoginSuccess);
         viewContainer.add(loginPanel, "LOGIN");
 
         add(viewContainer, BorderLayout.CENTER);
@@ -56,5 +64,8 @@ public class BaseApp extends JFrame{
 
     void showLoginScreen(){
         viewLayout.show(viewContainer, "LOGIN");
+        if (loginPanel != null) {
+            loginPanel.resetStatus("아이디와 비밀번호를 입력해주세요.");
+        }
     }
 }

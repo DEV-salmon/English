@@ -1,13 +1,13 @@
-import java.nio.file.Path;
+package vocagui.core;
 
 public class UserFileInfo {
     private final String userId;
-    private final Path userDirectory;
-    private final Path vocaFile;
-    private final Path incorrectFile;
-    private final Path statFile;
+    private final String userDirectory;
+    private final String vocaFile;
+    private final String incorrectFile;
+    private final String statFile;
 
-    public UserFileInfo(String userId, Path userDirectory, Path vocaFile, Path incorrectFile, Path statFile) {
+    public UserFileInfo(String userId, String userDirectory, String vocaFile, String incorrectFile, String statFile) {
         this.userId = userId;
         this.userDirectory = userDirectory;
         this.vocaFile = vocaFile;
@@ -19,19 +19,19 @@ public class UserFileInfo {
         return userId;
     }
 
-    public Path getUserDirectory() {
+    public String getUserDirectory() {
         return userDirectory;
     }
 
-    public Path getVocaFile() {
+    public String getVocaFile() {
         return vocaFile;
     }
 
-    public Path getIncorrectFile() {
+    public String getIncorrectFile() {
         return incorrectFile;
     }
 
-    public Path getStatFile() {
+    public String getStatFile() {
         return statFile;
     }
 }
