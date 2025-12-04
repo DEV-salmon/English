@@ -6,13 +6,13 @@ import java.awt.Dimension;
 import javax.swing.JComponent;
 
 public class MakePrettyInterface {
-        // 크기 고정
+    // 컴포넌트의 크기를 고정 설정
     public static void setFixedSize(JComponent component, int width, int height) {
         Dimension size = new Dimension(width, height);
-        component.setPreferredSize(size);  // 희망 크기
-        component.setMaximumSize(size);    // 최대 크기
-        component.setMinimumSize(size);    // 최소 크기
-        component.setAlignmentX(Component.CENTER_ALIGNMENT); // 중앙 정렬
+        component.setPreferredSize(size);
+        component.setMaximumSize(size);
+        component.setMinimumSize(size);
+        component.setAlignmentX(Component.CENTER_ALIGNMENT);
     }
 
 }
