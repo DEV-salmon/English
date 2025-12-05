@@ -1,5 +1,7 @@
 package Main;
 
-public enum GlobalSignal {
+import Signal.Signal;
+
+public enum GlobalSignal implements Signal {
     
 }

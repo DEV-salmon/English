@@ -1,5 +1,7 @@
 package Stat;
 
-public enum StatSignal {
+import Signal.Signal;
+
+public enum StatSignal implements Signal {
 
 }

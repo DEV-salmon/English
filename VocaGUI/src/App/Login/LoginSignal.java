@@ -1,6 +1,8 @@
 package Login;
 
-public enum LoginSignal {
+import Signal.Signal;
+
+public enum LoginSignal implements Signal {
     LOGIN,
     REGISTER,
     LOGIN_FAIL,

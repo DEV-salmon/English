@@ -1,5 +1,7 @@
 package Quiz;
 
-public enum QuizSignal {
+import Signal.Signal;
+
+public enum QuizSignal implements Signal {
 
 }
