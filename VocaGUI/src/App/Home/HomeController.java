@@ -4,10 +4,11 @@ import java.util.Locale;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
+import Signal.Controller;
 import Signal.Signal;
 import voca.core.Word;
 
-public class HomeController {
+public class HomeController implements Controller {
     private final HomeUI homeUI;
     private final Vector<Word> vocabulary;
     private boolean menuVisible;
@@ -16,9 +17,10 @@ public class HomeController {
         this(new Vector<>());
     }
 
+
     public HomeController(Vector<Word> vocabulary) {
-        this.vocabulary = vocabulary == null ? new Vector<>() : new Vector<>(vocabulary);
-        this.homeUI = new HomeUI(new Vector<>(this.vocabulary), this::handleSignal);
+        this.vocabulary = vocabulary;
+        this.homeUI = new HomeUI(new Vector<>(this.vocabulary), this::send);
         this.homeUI.setSideMenuVisible(menuVisible);
     }
 
@@ -26,11 +28,8 @@ public class HomeController {
         return homeUI;
     }
 
+    @Override
     public void send(Signal signal, Object payload) {
-        handleSignal(signal, payload);
-    }
-
-    private void handleSignal(Signal signal, Object payload) {
         if (!(signal instanceof HomeSignal homeSignal)) {
             return;
         }
@@ -41,12 +40,6 @@ public class HomeController {
                 break;
             case SEARCH:
                 handleSearch(payload);
-                break;
-            case ADD:
-                break;
-            case VIEW_MORE_INFO:
-                break;
-            case DELETE:
                 break;
             default:
                 break;
