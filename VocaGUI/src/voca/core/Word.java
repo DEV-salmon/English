@@ -1,6 +1,6 @@
 package voca.core;
 
-import voca.tts.TTS;
+import voca.tts.TTSGUI;
 
 public class Word {
     private String eng;
@@ -57,14 +57,14 @@ public class Word {
 
     // 영어 단어를 음성으로 출력
     public void voiceEng(){
-        TTS tts = new TTS();
-        tts.tts(eng);
+        TTSGUI TTSGUI = new TTSGUI();
+        TTSGUI.tts(eng);
     }
     
     // 예문을 음성으로 출력
     public void voiceEx(){
-        TTS tts = new TTS();
-        tts.tts((ex));
+        TTSGUI TTSGUI = new TTSGUI();
+        TTSGUI.tts((ex));
     }
 
     // 단어와 뜻을 문자열로 변환

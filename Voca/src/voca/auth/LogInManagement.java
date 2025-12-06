@@ -199,4 +199,8 @@ public class LogInManagement extends BaseMenu {
             FileManagement.saveVoca(new Vector<>(vocaBase), filePath);
         }
     }
+
+    public Vector<Login> getLoginList() {
+        return loginList;
+    }
 }

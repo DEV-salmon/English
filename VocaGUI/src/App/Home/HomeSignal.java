@@ -1,4 +1,4 @@
-package Home;
+package App.Home;
 
 import Signal.Signal;
 

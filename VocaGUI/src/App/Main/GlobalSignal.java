@@ -1,4 +1,4 @@
-package Main;
+package App.Main;
 
 import Signal.Signal;
 
