@@ -4,21 +4,37 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.GridBagLayout;
-import javax.swing.*;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JPasswordField;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+import Signal.Controller;
 import Utill.MakePrettyInterface;
 
-//로그인 UI
+// 로그인 UI
 public class LoginUI extends JPanel {
-    
-    //UI 부품 정의
+
+    // UI 부품 정의
     public JTextField userNameField;
     public JPasswordField passWordField;
     public JButton loginButton;
     public JButton registerButton;
 
-    // 로그인 화면 UI를 구성하는 생성자
+    private final Controller signalHandler;
+
     public LoginUI() {
+        this(null);
+    }
+
+    // 로그인 화면 UI를 구성하는 생성자
+    public LoginUI(Controller signalHandler) {
+        this.signalHandler = signalHandler != null ? signalHandler : (signal, data) -> {};
+
         setLayout(new GridBagLayout());
         setBackground(Color.WHITE);
 
@@ -32,14 +48,14 @@ public class LoginUI extends JPanel {
         welcome.setFont(new Font("Arial", Font.BOLD, 32));
         welcome.setAlignmentX(Component.CENTER_ALIGNMENT);
         panel.add(welcome);
-        
+
         panel.add(Box.createVerticalStrut(50));
 
         JLabel userNameLabel = new JLabel("UserName");
         userNameLabel.setFont(new Font("Arial", Font.BOLD, 16));
         userNameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         panel.add(userNameLabel);
-        
+
         panel.add(Box.createVerticalStrut(10));
 
         userNameField = new JTextField();
@@ -54,7 +70,7 @@ public class LoginUI extends JPanel {
         passWordLabel.setFont(new Font("Arial", Font.BOLD, 16));
         passWordLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         panel.add(passWordLabel);
-        
+
         panel.add(Box.createVerticalStrut(10));
 
         passWordField = new JPasswordField();
@@ -73,9 +89,9 @@ public class LoginUI extends JPanel {
         loginButton.setFont(new Font("Arial", Font.BOLD, 18));
         MakePrettyInterface.setFixedSize(loginButton, 350, 60);
         panel.add(loginButton);
-        
+
         panel.add(Box.createVerticalStrut(15));
-        
+
         registerButton = new JButton("Register");
         registerButton.setFont(new Font("Arial", Font.BOLD, 18));
         MakePrettyInterface.setFixedSize(registerButton, 350, 60);
@@ -86,9 +102,26 @@ public class LoginUI extends JPanel {
         teamLabel.setForeground(Color.GRAY);
         teamLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         panel.add(teamLabel);
-        
+
         panel.add(Box.createVerticalStrut(20));
-        
+
         add(panel);
+
+        wireSignals();
+    }
+
+    private void wireSignals() {
+        loginButton.addActionListener(e -> send(LoginSignal.LOGIN, collectCredentials()));
+        registerButton.addActionListener(e -> send(LoginSignal.REGISTER, userNameField.getText()));
+    }
+
+    private LoginCredentials collectCredentials() {
+        String username = userNameField.getText();
+        char[] password = passWordField.getPassword();
+        return new LoginCredentials(username, password);
+    }
+
+    private void send(LoginSignal signal, Object payload) {
+        signalHandler.send(signal, payload);
     }
 }

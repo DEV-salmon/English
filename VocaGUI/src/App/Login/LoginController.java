@@ -13,8 +13,7 @@ public class LoginController implements Controller {
 
     public LoginController(Controller signalHandler) {
         this.signalHandler = signalHandler;
-        this.loginUI = new LoginUI();
-        wireActions();
+        this.loginUI = new LoginUI(this);
     }
 
     public LoginUI getView() {
@@ -27,17 +26,31 @@ public class LoginController implements Controller {
 
     @Override
     public void send(Signal signal, Object data) {
-        // currently no inbound signals to handle
+        if (!(signal instanceof LoginSignal loginSignal)) {
+            return;
+        }
+
+        switch (loginSignal) {
+            case LOGIN:
+                handleLogin(data);
+                break;
+            case REGISTER:
+                notifySignal(LoginSignal.REGISTER, data);
+                break;
+            case LOGIN_SUCCESS:
+            case LOGIN_FAIL:
+                notifySignal(loginSignal, data);
+                break;
+            default:
+                break;
+        }
     }
 
-    private void wireActions() {
-        loginUI.loginButton.addActionListener(e -> handleLogin());
-        loginUI.registerButton.addActionListener(e -> notifySignal(LoginSignal.REGISTER, loginUI.userNameField.getText()));
-    }
+    private void handleLogin(Object payload) {
+        LoginCredentials credentials = payload instanceof LoginCredentials ? (LoginCredentials) payload : null;
+        String username = credentials != null ? credentials.getUsername() : null;
+        char[] password = credentials != null ? credentials.getPassword() : new char[0];
 
-    private void handleLogin() {
-        String username = loginUI.userNameField.getText();
-        char[] password = loginUI.passWordField.getPassword();
         if (isBlank(username) || password.length == 0) {
             notifySignal(LoginSignal.LOGIN_FAIL, username);
             return;
