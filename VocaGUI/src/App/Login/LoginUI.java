@@ -8,8 +8,10 @@ import javax.swing.*;
 
 import Utill.MakePrettyInterface;
 
+//로그인 UI
 public class LoginUI extends JPanel {
     
+    //UI 부품 정의
     public JTextField userNameField;
     public JPasswordField passWordField;
     public JButton loginButton;
