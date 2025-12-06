@@ -3,11 +3,11 @@ package voca.tts;
 import com.sun.speech.freetts.Voice;
 import com.sun.speech.freetts.VoiceManager;
 
-public class TTS {
+public class TTSGUI {
     private Voice voice;
 
     // FreeTTS 엔진을 초기화하는 생성자
-    public TTS() {
+    public TTSGUI() {
         String voiceName = "kevin16"; 
 
         try {

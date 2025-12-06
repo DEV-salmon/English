@@ -95,4 +95,8 @@ public class Voca extends BaseMenu {
         Vector<Word> defaultVoca = FileManagement.makeVoca(DEFAULT_VOCA_PATH);
         FileManagement.saveVoca(new Vector<>(defaultVoca), filePath);
     }
+
+    public Vector<Word> getVoca() {
+        return voca;
+    }
 }

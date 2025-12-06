@@ -1,4 +1,4 @@
-package Home;
+package App.Home;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -17,11 +17,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
 
+import App.Login.LoginController;
+import App.Login.LoginUI;
 import Test.ExampleVector;
 import Utill.MakePrettyInterface;
 import Signal.Controller;
 import voca.core.Word;
-import Main.SideMenu;
+import App.Main.SideMenu;
 
 public class HomeUI extends JPanel {
 

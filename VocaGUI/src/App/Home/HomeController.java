@@ -1,17 +1,17 @@
-package Home;
+package App.Home;
 
 import java.util.Locale;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
-import Main.GlobalSignal;
+import App.Main.GlobalSignal;
 import Signal.Controller;
 import Signal.Signal;
 import voca.core.Word;
 
 public class HomeController implements Controller {
     private final HomeUI homeUI;
-    private final Vector<Word> vocabulary;
+    private Vector<Word> vocabulary;
     private boolean menuVisible;
     private final Controller globalHandler;
 
@@ -89,5 +89,11 @@ public class HomeController implements Controller {
             }
         }
         return false;
+    }
+
+
+    public void updateVocabulary(Vector<Word> newVocabulary) {
+        this.vocabulary = new Vector<>(newVocabulary);
+        homeUI.updateWords(newVocabulary);
     }
 }

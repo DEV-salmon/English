@@ -1,4 +1,4 @@
-package Login;
+package App.Login;
 
 public class LoginCredentials {
     private final String username;

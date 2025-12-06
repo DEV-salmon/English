@@ -1,18 +1,23 @@
-package Main;
+package App.Main;
+
 import java.awt.CardLayout;
+import java.util.Vector;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import Home.HomeController;
-import Home.HomeSignal;
-import Login.LoginController;
-import Login.LoginSignal;
+import App.Home.HomeController;
+import App.Home.HomeSignal;
+import App.Login.LoginController;
+import App.Login.LoginSignal;
+import App.Login.LoginUI;
 import Quiz.QuizController;
 import Signal.Controller;
 import Signal.Signal;
 import Stat.StatController;
 import Test.ExampleVector;
-import Main.GlobalSignal;
+import App.Main.GlobalSignal;
+import voca.app.Voca;
+import voca.core.Word;
 
 public class MainController implements Controller {
     private static final String CARD_LOGIN = "login";
@@ -81,6 +86,10 @@ public class MainController implements Controller {
                 homeController.send(HomeSignal.TOGGLE_MENU, null);
                 break;
             case HOME:
+                if (data instanceof voca.app.Voca voca) {
+                    Vector<voca.core.Word> userVocabulary = voca.getVoca();
+                    homeController.updateVocabulary(userVocabulary);
+                }
                 showHome();
                 break;
             case FILE:
@@ -88,6 +97,7 @@ public class MainController implements Controller {
             case QUIZ:
                 break;
             case LOGOUT:
+                loginController.resetFields();
                 showLogin();
                 break;
             default:

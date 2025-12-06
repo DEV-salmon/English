@@ -1,4 +1,4 @@
-package Login;
+package App.Login;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -12,6 +12,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.*;
 
 import Signal.Controller;
 import Utill.MakePrettyInterface;
@@ -24,6 +25,7 @@ public class LoginUI extends JPanel {
     public JPasswordField passWordField;
     public JButton loginButton;
     public JButton registerButton;
+    public JOptionPane optionPane;
 
     private final Controller signalHandler;
 
@@ -76,6 +78,7 @@ public class LoginUI extends JPanel {
         passWordField = new JPasswordField();
         passWordField.setHorizontalAlignment(JPasswordField.CENTER);
         passWordField.setFont(new Font("Arial", Font.PLAIN, 18));
+        passWordField.setText("");
         MakePrettyInterface.setFixedSize(passWordField, 350, 50);
         panel.add(passWordField);
 
@@ -111,8 +114,14 @@ public class LoginUI extends JPanel {
     }
 
     private void wireSignals() {
-        loginButton.addActionListener(e -> send(LoginSignal.LOGIN, collectCredentials()));
-        registerButton.addActionListener(e -> send(LoginSignal.REGISTER, userNameField.getText()));
+        loginButton.addActionListener(e -> {
+            System.out.println("로그인 버튼");
+            send(LoginSignal.LOGIN, collectCredentials());
+        });
+        registerButton.addActionListener(e -> {
+            System.out.println("회원가입 버튼");
+            send(LoginSignal.REGISTER, collectCredentials());
+        });
     }
 
     private LoginCredentials collectCredentials() {
