@@ -8,6 +8,7 @@ import Home.HomeSignal;
 import Login.LoginController;
 import Login.LoginSignal;
 import Quiz.QuizController;
+import Quiz.QuizSignal;
 import Signal.Controller;
 import Signal.Signal;
 import Stat.StatController;
@@ -17,6 +18,7 @@ import Main.GlobalSignal;
 public class MainController implements Controller {
     private static final String CARD_LOGIN = "login";
     private static final String CARD_HOME = "home";
+    private static final String CARD_QUIZ = "Quiz";
 
     private final HomeController homeController;
     private final LoginController loginController;
@@ -36,11 +38,11 @@ public class MainController implements Controller {
         this.homeController = new HomeController(exampleVector.voca, this);
         this.loginController = new LoginController(this);
         this.statController = new StatController();
-        this.quizController = new QuizController();
+        this.quizController = new QuizController(exampleVector.voca,this);
 
         rootPanel.add(loginController.getView(), CARD_LOGIN);
         rootPanel.add(homeController.getView(), CARD_HOME);
-
+        rootPanel.add(quizController.getView(),CARD_QUIZ);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(600, 800);
         frame.setContentPane(rootPanel);
@@ -59,19 +61,26 @@ public class MainController implements Controller {
         cardLayout.show(rootPanel, CARD_HOME);
     }
 
+    private void showQuiz(){
+        cardLayout.show(rootPanel, CARD_QUIZ);
+    }
+
     @Override
     public void send(Signal s, Object d) {
         if (s instanceof GlobalSignal globalSignal) {
             handleGlobal(globalSignal, d);
             return;
         }
-        if (s instanceof HomeSignal) {
+        else if (s instanceof HomeSignal) {
             homeController.send(s, d);
             return;
         }
-        if (s instanceof LoginSignal) {
+        else if (s instanceof LoginSignal) {
             loginController.send(s, d);
             return;
+        }
+        else if (s instanceof QuizSignal){
+            quizController.send(s,d);
         }
     }
 
@@ -86,6 +95,7 @@ public class MainController implements Controller {
             case FILE:
             case STAT:
             case QUIZ:
+                showQuiz();
                 break;
             case LOGOUT:
                 showLogin();

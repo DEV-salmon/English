@@ -32,7 +32,7 @@ public class HomeUI extends JPanel {
 
     // 단어 목록을 받아 홈 화면을 구성하는 생성자
     public HomeUI(Vector<Word> voca, Controller signalHandler) {
-        this.signalHandler = signalHandler != null ? signalHandler : (signal, data) -> {};
+        this.signalHandler = signalHandler;
 
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
