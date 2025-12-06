@@ -32,12 +32,12 @@ public class HomeUI extends JPanel {
 
     // 단어 목록을 받아 홈 화면을 구성하는 생성자
     public HomeUI(Vector<Word> voca, Controller signalHandler) {
-        this.signalHandler = signalHandler;
+        this.signalHandler = signalHandler != null ? signalHandler : (signal, data) -> {};
 
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
 
-        sideMenu = new SideMenu();
+        sideMenu = new SideMenu(signalHandler);
         sideMenu.setVisible(false);
 
         JPanel contentPanel = new JPanel(new BorderLayout());
@@ -47,10 +47,7 @@ public class HomeUI extends JPanel {
         topPanel.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
         topPanel.setBackground(Color.WHITE);
 
-        JButton menuBtn = new JButton("☰");
-        menuBtn.setFont(new Font("Arial", Font.BOLD, 30));
-        MakePrettyInterface.setFixedSize(menuBtn, 50, 50);
-        menuBtn.addActionListener(e -> sendSignal(HomeSignal.TOGGLE_MENU, null));
+        JButton menuBtn = sideMenu.getToggleButton();
 
         searchField = new JTextField(" 입력하세요");
         searchField.setFont(new Font("맑은 고딕", Font.PLAIN, 16));

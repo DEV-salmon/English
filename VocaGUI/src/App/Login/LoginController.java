@@ -1,5 +1,8 @@
 package Login;
 
+import javax.swing.JOptionPane;
+
+import Main.GlobalSignal;
 import Signal.Controller;
 import Signal.Signal;
 
@@ -35,11 +38,13 @@ public class LoginController implements Controller {
                 handleLogin(data);
                 break;
             case REGISTER:
-                notifySignal(LoginSignal.REGISTER, data);
+                handleRegister(data);
                 break;
             case LOGIN_SUCCESS:
+                handleLoginSuccess(data);
+                break;
             case LOGIN_FAIL:
-                notifySignal(loginSignal, data);
+                handleLoginFail(data);
                 break;
             default:
                 break;
@@ -52,18 +57,33 @@ public class LoginController implements Controller {
         char[] password = credentials != null ? credentials.getPassword() : new char[0];
 
         if (isBlank(username) || password.length == 0) {
-            notifySignal(LoginSignal.LOGIN_FAIL, username);
+            handleLoginFail(username);
             return;
         }
 
-        notifySignal(LoginSignal.LOGIN_SUCCESS, username);
+        handleLoginSuccess(username);
+    }
+
+    private void handleLoginSuccess(Object data) {
+        sendToHandler(GlobalSignal.HOME, data);
+        sendToHandler(LoginSignal.LOGIN_SUCCESS, data);
+    }
+
+    private void handleLoginFail(Object data) {
+        JOptionPane.showMessageDialog(loginUI, "로그인 실패: 아이디와 비밀번호를 확인하세요.");
+        sendToHandler(LoginSignal.LOGIN_FAIL, data);
+    }
+
+    private void handleRegister(Object data) {
+        JOptionPane.showMessageDialog(loginUI, "회원가입 기능은 준비 중입니다.");
+        sendToHandler(LoginSignal.REGISTER, data);
     }
 
     private boolean isBlank(String text) {
         return text == null || text.trim().isEmpty();
     }
 
-    private void notifySignal(LoginSignal signal, Object payload) {
+    private void sendToHandler(Signal signal, Object payload) {
         if (signalHandler != null) {
             signalHandler.send(signal, payload);
         }

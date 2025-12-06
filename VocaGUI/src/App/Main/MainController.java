@@ -1,7 +1,6 @@
 package Main;
 import java.awt.CardLayout;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import Home.HomeController;
@@ -13,6 +12,7 @@ import Signal.Controller;
 import Signal.Signal;
 import Stat.StatController;
 import Test.ExampleVector;
+import Main.GlobalSignal;
 
 public class MainController implements Controller {
     private static final String CARD_LOGIN = "login";
@@ -33,7 +33,7 @@ public class MainController implements Controller {
         this.rootPanel = new JPanel(cardLayout);
 
         ExampleVector exampleVector = new ExampleVector();
-        this.homeController = new HomeController(exampleVector.voca);
+        this.homeController = new HomeController(exampleVector.voca, this);
         this.loginController = new LoginController(this);
         this.statController = new StatController();
         this.quizController = new QuizController();
@@ -61,34 +61,42 @@ public class MainController implements Controller {
 
     @Override
     public void send(Signal s, Object d) {
+        if (s instanceof GlobalSignal globalSignal) {
+            handleGlobal(globalSignal, d);
+            return;
+        }
         if (s instanceof HomeSignal) {
             homeController.send(s, d);
             return;
         }
         if (s instanceof LoginSignal loginSignal) {
-            handleLogin(loginSignal, d);
+            loginController.send(loginSignal, d);
             return;
         }
     }
 
-    private void handleLogin(LoginSignal signal, Object data) {
+    private void handleGlobal(GlobalSignal signal, Object data) {
         switch (signal) {
-            case LOGIN_SUCCESS:
+            case TOGGLE_MENU:
+                homeController.send(HomeSignal.TOGGLE_MENU, null);
+                break;
+            case HOME:
                 showHome();
                 break;
-            case LOGIN_FAIL:
-                JOptionPane.showMessageDialog(frame, "로그인 실패: 아이디와 비밀번호를 확인하세요.");
+            case FILE:
+            case STAT:
+            case QUIZ:
+                // TODO: attach navigation to other screens when implemented
                 break;
-            case REGISTER:
-                JOptionPane.showMessageDialog(frame, "회원가입 기능은 준비 중입니다.");
+            case LOGOUT:
+                showLogin();
                 break;
-            case LOGIN:
             default:
                 break;
         }
     }
 
     public static void main(String[] args) {
-        new MainController();
+        SwingUtilities.invokeLater(() -> new MainController().start());
     }
 }

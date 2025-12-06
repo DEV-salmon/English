@@ -4,6 +4,7 @@ import java.util.Locale;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
+import Main.GlobalSignal;
 import Signal.Controller;
 import Signal.Signal;
 import voca.core.Word;
@@ -12,14 +13,19 @@ public class HomeController implements Controller {
     private final HomeUI homeUI;
     private final Vector<Word> vocabulary;
     private boolean menuVisible;
+    private final Controller globalHandler;
 
     public HomeController() {
-        this(new Vector<>());
+        this(new Vector<>(), null);
     }
 
-
     public HomeController(Vector<Word> vocabulary) {
-        this.vocabulary = vocabulary;
+        this(vocabulary, null);
+    }
+
+    public HomeController(Vector<Word> vocabulary, Controller globalHandler) {
+        this.vocabulary = vocabulary == null ? new Vector<>() : new Vector<>(vocabulary);
+        this.globalHandler = globalHandler;
         this.homeUI = new HomeUI(new Vector<>(this.vocabulary), this::send);
         this.homeUI.setSideMenuVisible(menuVisible);
     }
@@ -31,6 +37,9 @@ public class HomeController implements Controller {
     @Override
     public void send(Signal signal, Object payload) {
         if (!(signal instanceof HomeSignal homeSignal)) {
+            if (globalHandler != null && signal instanceof GlobalSignal) {
+                globalHandler.send(signal, payload);
+            }
             return;
         }
 
