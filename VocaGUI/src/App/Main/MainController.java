@@ -69,8 +69,8 @@ public class MainController implements Controller {
             homeController.send(s, d);
             return;
         }
-        if (s instanceof LoginSignal loginSignal) {
-            loginController.send(loginSignal, d);
+        if (s instanceof LoginSignal) {
+            loginController.send(s, d);
             return;
         }
     }
@@ -86,7 +86,6 @@ public class MainController implements Controller {
             case FILE:
             case STAT:
             case QUIZ:
-                // TODO: attach navigation to other screens when implemented
                 break;
             case LOGOUT:
                 showLogin();
