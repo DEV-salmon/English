@@ -1,10 +1,10 @@
-package App.Home;
+package GUI.Home;
 
 import java.util.Locale;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
-import App.Main.GlobalSignal;
+import GUI.Main.GlobalSignal;
 import Signal.Controller;
 import Signal.Signal;
 import voca.core.Word;
@@ -47,9 +47,11 @@ public class HomeController implements Controller {
             case TOGGLE_MENU:
                 toggleMenu();
                 break;
-            case SEARCH:
+            case CHANGE_TEXT_FIELD:
                 handleSearch(payload);
                 break;
+            case ADD_WORD:
+
             default:
                 break;
         }
@@ -58,6 +60,11 @@ public class HomeController implements Controller {
     private void toggleMenu() {
         menuVisible = !menuVisible;
         homeUI.setSideMenuVisible(menuVisible);
+    }
+
+    private void addWord(String str){
+        
+
     }
 
     private void handleSearch(Object payload) {

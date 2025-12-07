@@ -1,21 +1,21 @@
-package App.Main;
+package GUI.Main;
 
 import java.awt.CardLayout;
 import java.util.Vector;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import App.Home.HomeController;
-import App.Home.HomeSignal;
-import App.Login.LoginController;
-import App.Login.LoginSignal;
-import Quiz.QuizController;
-import Quiz.QuizSignal;
+import GUI.Home.HomeController;
+import GUI.Home.HomeSignal;
+import GUI.Login.LoginController;
+import GUI.Login.LoginSignal;
+import GUI.Quiz.QuizController;
+import GUI.Quiz.QuizSignal;
 import Signal.Controller;
 import Signal.Signal;
-import Stat.StatController;
+import GUI.Stat.StatController;
 import Test.ExampleVector;
-import App.Main.GlobalSignal;
+import GUI.Main.GlobalSignal;
 import voca.app.Voca;
 import voca.core.Word;
 
@@ -94,8 +94,8 @@ public class MainController implements Controller {
                 homeController.send(HomeSignal.TOGGLE_MENU, null);
                 break;
             case HOME:
-                if (data instanceof voca.app.Voca voca) {
-                    Vector<voca.core.Word> userVocabulary = voca.getVoca();
+                if (data instanceof Voca voca) {
+                    Vector<Word> userVocabulary = voca.getVoca();
                     homeController.updateVocabulary(userVocabulary);
                 }
                 showHome();
@@ -115,6 +115,6 @@ public class MainController implements Controller {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new MainController().start());
+        new MainController().start();
     }
 }

@@ -1,4 +1,4 @@
-package App.Home;
+package GUI.Home;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -16,14 +16,16 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
-import App.Login.LoginController;
-import App.Login.LoginUI;
+import GUI.Login.LoginController;
+import GUI.Login.LoginUI;
 import Test.ExampleVector;
 import Utill.MakePrettyInterface;
 import Signal.Controller;
 import voca.core.Word;
-import App.Main.SideMenu;
+import GUI.Main.SideMenu;
 
 public class HomeUI extends JPanel {
 
@@ -54,12 +56,31 @@ public class HomeUI extends JPanel {
         searchField = new JTextField(" 입력하세요");
         searchField.setFont(new Font("맑은 고딕", Font.PLAIN, 16));
         MakePrettyInterface.setFixedSize(searchField, 400, 50);
-        searchField.addActionListener(e -> sendSignal(HomeSignal.SEARCH, searchField.getText()));
+        searchField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                detectChange();
+            }
 
-        JButton searchBtn = new JButton("🔍");
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                detectChange();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                detectChange();
+            }
+            private void detectChange(){ 
+                signalHandler.send(HomeSignal.CHANGE_TEXT_FIELD, searchField.getText());
+            }
+            
+        });
+
+        JButton searchBtn = new JButton("+");
         searchBtn.setFont(new Font("Arial", Font.BOLD, 30));
         MakePrettyInterface.setFixedSize(searchBtn, 50, 50);
-        searchBtn.addActionListener(e -> sendSignal(HomeSignal.SEARCH, searchField.getText()));
+        searchBtn.addActionListener(e -> sendSignal(HomeSignal.ADD_WORD, searchField.getText()));
 
         topPanel.add(menuBtn, BorderLayout.WEST);
         topPanel.add(searchField, BorderLayout.CENTER);
@@ -72,6 +93,7 @@ public class HomeUI extends JPanel {
         updateWords(voca);
 
         JScrollPane scrollPane = new JScrollPane(listContainer);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         scrollPane.setBorder(new LineBorder(Color.GRAY, 1));
 
         contentPanel.add(topPanel, BorderLayout.NORTH);
@@ -94,7 +116,7 @@ public class HomeUI extends JPanel {
         label.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
         panel.add(label, BorderLayout.CENTER);
 
-        JButton plusButton = new JButton("+");
+        JButton plusButton = new JButton("···");
         plusButton.setFont(new Font("Arial", Font.BOLD, 20));
         plusButton.setPreferredSize(new Dimension(30, 30));
         plusButton.setForeground(Color.WHITE);

@@ -1,17 +1,25 @@
-package App.Login;
+package GUI.Login;
 
 import javax.swing.*;
 
-import App.Home.HomeUI;
-import App.Main.GlobalSignal;
+import GUI.Home.HomeUI;
+import GUI.Main.GlobalSignal;
 import Signal.Controller;
 import Signal.Signal;
+import Utill.MakePrettyInterface;
 import voca.app.Voca;
 import voca.auth.LogInManagement;
 import voca.auth.Login;
 import voca.core.UserFileInfo;
 import voca.management.FileManagement;
-
+import java.awt.Window;
+import javax.swing.SwingUtilities;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridBagLayout;
+import java.security.Identity;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Vector;
@@ -176,30 +184,120 @@ public class LoginController implements Controller {
         }
     }
 
-    private Object[] showRegisterDialogue(){
+    //한시간째 매서드 하나 만드는 중 셤공부 언제하지
+    //
+    private Object[] showRegisterDialogue() {
+        UIManager.put("OptionPane.background", Color.WHITE);
+        UIManager.put("Panel.background", Color.WHITE);
+        UIManager.put("Label.background", Color.WHITE);
+
         JTextField newUsernameField = new JTextField(20);
         JPasswordField newPasswordField = new JPasswordField(20);
-        newPasswordField.setEchoChar((char) 0);
+        char defaultEchoChar = newPasswordField.getEchoChar();
 
-        // 2. 필드를 담을 패널 생성 및 배치 (BoxLayout 사용)
+        JLabel RegisterText = new JLabel("Register");
+        RegisterText.setFont(new Font("맑은 고딕", Font.BOLD, 18));
+        JPanel rootRegisterText = new JPanel(new GridBagLayout());
+        rootRegisterText.add(RegisterText);
+        MakePrettyInterface.makeWhite(rootRegisterText);
+
+        JPanel basePanel = new JPanel(new GridBagLayout());
+        MakePrettyInterface.makeWhite(basePanel);
+        MakePrettyInterface.setFixedSize(basePanel, 450, 300);
+
         JPanel registerPanel = new JPanel();
         registerPanel.setLayout(new BoxLayout(registerPanel, BoxLayout.Y_AXIS));
+        MakePrettyInterface.makeWhite(registerPanel);
+        basePanel.add(registerPanel);
 
-        registerPanel.add(new JLabel("사용할 아이디를 입력하세요:"));
-        registerPanel.add(newUsernameField);
-        registerPanel.add(Box.createVerticalStrut(10)); // 수직 간격 추가
-        registerPanel.add(new JLabel("사용할 비밀번호를 입력하세요:"));
-        registerPanel.add(newPasswordField);
+        JLabel IDText = new JLabel("New ID ");
+        IDText.setFont(new Font("맑은 고딕", Font.BOLD, 12));
+        JPanel IdFlow = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        MakePrettyInterface.makeWhite(IdFlow);
+        MakePrettyInterface.makeShadow(newUsernameField, false);
+        IdFlow.add(IDText);
+        IdFlow.add(newUsernameField);
 
-        // 3. JOptionPane을 사용하여 팝업 표시
-        int result = JOptionPane.showConfirmDialog(
+        JLabel PasswordText = new JLabel("New PW ");
+        PasswordText.setFont(new Font("맑은 고딕", Font.BOLD, 12));
+        JPanel PwFlow = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        MakePrettyInterface.makeWhite(PwFlow);
+        MakePrettyInterface.makeShadow(newPasswordField, false);
+        PwFlow.add(PasswordText);
+        PwFlow.add(newPasswordField);
+
+        JPanel PwcheckPanel = new JPanel(new BorderLayout());
+        JCheckBox showPwCheck = new JCheckBox("비밀번호 보기");
+        PwcheckPanel.add(showPwCheck,BorderLayout.EAST);
+        showPwCheck.setBackground(Color.WHITE);
+        showPwCheck.setFont(new Font("맑은 고딕", Font.PLAIN, 11));
+        showPwCheck.setFocusPainted(false);
+        
+        showPwCheck.addItemListener(e -> {
+            if (showPwCheck.isSelected()) {
+                newPasswordField.setEchoChar((char) 0);
+            } else {
+                newPasswordField.setEchoChar(defaultEchoChar);
+            }
+        });
+        
+
+        JButton btnJoin = new JButton("가입");
+        MakePrettyInterface.setFixedSize(btnJoin, 50, 20);
+        btnJoin.setFont(new Font("맑은 고딕", Font.BOLD, 12));
+        JButton btnCancel = new JButton("취소");
+        MakePrettyInterface.setFixedSize(btnCancel, 50, 20);
+        btnCancel.setFont(new Font("맑은 고딕", Font.BOLD, 12));
+
+        btnJoin.setBackground(Color.WHITE);
+        btnCancel.setBackground(Color.WHITE);
+        MakePrettyInterface.makeShadow(btnJoin, false);
+        MakePrettyInterface.makeShadow(btnCancel, false);
+        btnJoin.setFocusPainted(false);
+        btnCancel.setFocusPainted(false);
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        MakePrettyInterface.makeWhite(buttonPanel);
+        buttonPanel.add(btnJoin);
+        buttonPanel.add(btnCancel);
+
+        registerPanel.add(rootRegisterText);
+        registerPanel.add(Box.createVerticalStrut(30));
+        registerPanel.add(IdFlow);
+        registerPanel.add(Box.createVerticalStrut(10));
+        registerPanel.add(PwFlow);
+        registerPanel.add(Box.createVerticalStrut(5));
+        registerPanel.add(PwcheckPanel);
+        registerPanel.add(Box.createVerticalStrut(10));
+        registerPanel.add(buttonPanel);
+
+
+        final int[] resultState = {JOptionPane.CANCEL_OPTION};
+
+        btnJoin.addActionListener(e -> {
+            resultState[0] = JOptionPane.OK_OPTION;
+            Window w = SwingUtilities.getWindowAncestor(btnJoin);
+            if (w != null) w.dispose();
+        });
+
+        btnCancel.addActionListener(e -> {
+            resultState[0] = JOptionPane.CANCEL_OPTION;
+            Window w = SwingUtilities.getWindowAncestor(btnCancel);
+            if (w != null) w.dispose();
+        });
+
+        JOptionPane.showOptionDialog(
                 loginUI,
-                registerPanel,
+                basePanel,
                 "Register",
-                JOptionPane.OK_CANCEL_OPTION,
-                JOptionPane.PLAIN_MESSAGE
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                new Object[]{},
+                null
         );
-        return new Object[]{newUsernameField,newPasswordField,result};
+
+        return new Object[]{newUsernameField, newPasswordField, resultState[0]};
     }
 
     private boolean isBlank(String text) {

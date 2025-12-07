@@ -29,6 +29,33 @@ public class MakePrettyInterface {
     public static void makeShadow(JButton jButton){
         jButton.setBorder(BorderFactory.createMatteBorder(1, 1, 4, 4, Color.GRAY));
     }
+    public static void makeShadow(JTextField jButton){
+        jButton.setBorder(BorderFactory.createMatteBorder(1, 1, 4, 4, Color.GRAY));
+    }
+    public static void makeShadow(JPanel jPanel, boolean isBold){
+        if(isBold){
+            jPanel.setBorder(BorderFactory.createMatteBorder(1, 1, 4, 4, Color.GRAY));
+        }
+        else{
+            jPanel.setBorder(BorderFactory.createMatteBorder(1, 1, 2, 2, Color.GRAY));
+        }
+    }
+    public static void makeShadow(JButton jButton, boolean isBold){
+       if(isBold){
+            jButton.setBorder(BorderFactory.createMatteBorder(1, 1, 4, 4, Color.GRAY));
+        }
+        else{
+            jButton.setBorder(BorderFactory.createMatteBorder(1, 1, 2, 2, Color.GRAY));
+        }
+    }
+    public static void makeShadow(JTextField jButton, boolean isBold){
+        if(isBold){
+            jButton.setBorder(BorderFactory.createMatteBorder(1, 1, 4, 4, Color.GRAY));
+        }
+        else{
+            jButton.setBorder(BorderFactory.createMatteBorder(1, 1, 2, 2, Color.GRAY));
+        }
+    }
     public static void makeWhite(JPanel jPanel){
         jPanel.setBackground(Color.WHITE);
         jPanel.setOpaque(true);
@@ -36,6 +63,10 @@ public class MakePrettyInterface {
     public static void makeWhite(JButton jButton){
         jButton.setBackground(Color.WHITE);
         jButton.setOpaque(true);
+    }
+    public static void makeWhite(JLabel jLabel){
+        jLabel.setBackground(Color.WHITE);
+        jLabel.setOpaque(true);
     }
     
 

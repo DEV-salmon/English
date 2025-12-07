@@ -1,4 +1,4 @@
-package App.Home;
+package GUI.Home;
 
 public class WordEditPanel {
 

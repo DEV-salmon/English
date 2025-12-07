@@ -1,4 +1,4 @@
-package App.Main;
+package GUI.Main;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -9,9 +9,8 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
-
+import GUI.*;
 import Signal.Controller;
-import App.Main.GlobalSignal;
 import Utill.MakePrettyInterface;
 
 public class SideMenu extends JPanel {

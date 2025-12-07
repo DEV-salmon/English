@@ -1,4 +1,4 @@
-package Quiz;
+package GUI.Quiz;
 
 import Signal.Signal;
 

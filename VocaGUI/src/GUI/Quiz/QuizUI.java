@@ -1,4 +1,4 @@
-package Quiz;
+package GUI.Quiz;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -18,7 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 
-import App.Main.SideMenu;
+import GUI.Main.SideMenu;
 import Signal.Controller;
 import Utill.MakePrettyInterface;
 

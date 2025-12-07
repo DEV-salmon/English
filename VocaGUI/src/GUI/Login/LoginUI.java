@@ -1,4 +1,4 @@
-package App.Login;
+package GUI.Login;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -35,7 +35,7 @@ public class LoginUI extends JPanel {
 
     // 로그인 화면 UI를 구성하는 생성자
     public LoginUI(Controller signalHandler) {
-        this.signalHandler = signalHandler != null ? signalHandler : (signal, data) -> {};
+        this.signalHandler = signalHandler;
 
         setLayout(new GridBagLayout());
         setBackground(Color.WHITE);
@@ -115,11 +115,9 @@ public class LoginUI extends JPanel {
 
     private void wireSignals() {
         loginButton.addActionListener(e -> {
-            System.out.println("로그인 버튼");
             send(LoginSignal.LOGIN, collectCredentials());
         });
         registerButton.addActionListener(e -> {
-            System.out.println("회원가입 버튼");
             send(LoginSignal.REGISTER, collectCredentials());
         });
     }

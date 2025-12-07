@@ -1,4 +1,4 @@
-package Quiz;
+package GUI.Quiz;
 
 import java.util.Vector;
 
@@ -10,11 +10,11 @@ public class QuizController implements Controller {
     private final QuizUI quizUI;
     private final Vector<Word> vacabulary;
     private boolean menuVisible;
-    private final Controller globalHandler;
+    private final Controller controller;
 
-    public QuizController(Vector<Word> vocabulary, Controller globalHandler){
+    public QuizController(Vector<Word> vocabulary, Controller controller){
         this.vacabulary =vocabulary;
-        this.globalHandler = globalHandler;
+        this.controller = controller;
         this.quizUI = new QuizUI((this::send));
         this.quizUI.setSideMenuVisible(menuVisible);
     }

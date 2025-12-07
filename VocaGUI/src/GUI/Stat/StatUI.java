@@ -1,4 +1,4 @@
-package Stat;
+package GUI.Stat;
 
 public class StatUI {
 
