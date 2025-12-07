@@ -1,5 +1,9 @@
 package GUI.Stat;
 
-public class StatUI {
+import Signal.Signal;
 
+public enum StatSignal implements Signal {
+    STAT_SHOW_BUTTON,       
+    STAT_SAVE_BUTTON,       
+    STAT_OPTION_SELECT      
 }
