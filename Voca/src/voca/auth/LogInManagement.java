@@ -181,7 +181,7 @@ public class LogInManagement extends BaseMenu {
             waitConsole(scanner);
         }
     }
-    private void initializeUserVocaFile(String userId){
+    public void initializeUserVocaFile(String userId){
         UserFileInfo userInfo = new UserFileInfo(userId, USER_VOCA_DIR);
         String directoryPath = userInfo.getUserDirectory();
         File directory = new File(directoryPath);

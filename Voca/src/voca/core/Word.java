@@ -52,14 +52,14 @@
 //
 //    // 영어 단어 음성 출력
 //    public void voiceEng(){
-//        TTSGUI TTSGUI = new TTSGUI();
-//        TTSGUI.tts(eng);
+//        TTS tts = new TTS();
+//        tts.tts(eng);
 //    }
 //
 //    // 영어 예문 음성 출력
 //    public void voiceEx(){
-//        TTSGUI TTSGUI = new TTSGUI();
-//        TTSGUI.tts((ex));
+//        TTS tts = new TTS();
+//        tts.tts((ex));
 //    }
 //
 //    @Override

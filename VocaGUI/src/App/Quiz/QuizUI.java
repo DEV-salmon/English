@@ -18,7 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 
-import Main.SideMenu;
+import App.Main.SideMenu;
 import Signal.Controller;
 import Utill.MakePrettyInterface;
 
