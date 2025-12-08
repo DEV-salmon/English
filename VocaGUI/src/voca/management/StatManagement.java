@@ -36,6 +36,10 @@ public class StatManagement extends BaseMenu {
         this.statFilePath = userInfo.getStatFilePath();
     }
 
+    public String getStatFilePath() {
+        return statFilePath;
+    }
+
     /**
      * 뜻->영어 정답을 1 증가시키고 자동 저장합니다.
      */

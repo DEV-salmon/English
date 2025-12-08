@@ -112,7 +112,11 @@ public class HomeController implements Controller {
                 vocabulary.add(new Word(eng, korArray, ex));
             }
             homeUI.updateWords(vocabulary);
-            FileManagement.saveVoca(vocabulary, userFileInfo.getVocaFilePath());
+            if (userFileInfo != null) {
+                FileManagement.saveVoca(vocabulary, userFileInfo.getVocaFilePath());
+            } else {
+                JOptionPane.showMessageDialog(homeUI, "사용자 정보가 없어 파일로 저장하지 못했습니다.");
+            }
             JOptionPane.showMessageDialog(homeUI, "단어 추가 성공");
         }
     }

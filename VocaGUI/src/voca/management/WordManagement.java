@@ -264,7 +264,7 @@ public class WordManagement extends BaseMenu{
     /**
      * 콤마로 구분된 한국어 뜻을 잘라 깨끗하게 배열로 만듭니다.
      */
-    private String[] splitKor(String korLine){
+    public String[] splitKor(String korLine){
         String[] korArray = korLine.split(",");
         List<String> cleaned = new ArrayList<>();
         for(String kor : korArray){

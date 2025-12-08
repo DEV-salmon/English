@@ -44,6 +44,8 @@ public class QuizUI extends JPanel {
 
         sideMenu = new SideMenu(signalHandler);
         sideMenu.setVisible(false);
+        JPanel contentPanel = new JPanel(new BorderLayout());
+        MakePrettyInterface.makeWhite(contentPanel);
 
         JPanel btns = new JPanel(new GridLayout(2,2,50,50));
         MakePrettyInterface.makeWhite(btns);
@@ -86,9 +88,12 @@ public class QuizUI extends JPanel {
         subjectQuiz = new JButton("주관식 퀴즈");
         objectQuiz = new JButton("객관식 퀴즈");
 
-        add(topPanel,BorderLayout.NORTH);
+        add(sideMenu, BorderLayout.WEST);
+        add(contentPanel, BorderLayout.CENTER);
+
+        contentPanel.add(topPanel,BorderLayout.NORTH);
         topPanel.add(menuBtn);
-        add(centerBasePanel, BorderLayout.CENTER);
+        contentPanel.add(centerBasePanel, BorderLayout.CENTER);
         centerBasePanel.add(centerPanel);
         centerPanel.add(centerTopPanel);
         centerTopPanel.add(quizText);
