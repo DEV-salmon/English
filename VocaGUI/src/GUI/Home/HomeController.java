@@ -66,10 +66,17 @@ public class HomeController implements Controller {
                 break;
             case ADD_WORD:
                 handleAddWord(payload);
+            case FIX:
+                if(payload instanceof Word word){
+                    handleAdd(word);
+                }
+                break;
             default:
                 break;
         }
     }
+
+
 
     private void toggleMenu() {
         menuVisible = !menuVisible;
@@ -77,10 +84,9 @@ public class HomeController implements Controller {
     }
 
     private void handleAddWord(Object payload) {
-        Object[] inputData = showAddWordDialogue();
+        Object[] inputData = homeUI.showAddWordDialogue();
         handleAddWordJudgement(inputData);
     }
-
     private void handleAddWordJudgement(Object[] data) {
         JTextField newENGField = (JTextField) data[0];
         JTextField newKORField = (JTextField) data[1];
@@ -94,7 +100,7 @@ public class HomeController implements Controller {
         if (result == JOptionPane.OK_OPTION) {
             for (Word word : vocabulary) {
                 if (word.getEng().equalsIgnoreCase(eng)) {
-                    JOptionPane.showMessageDialog(homeUI, "단어 추가 실패 : 동일 단어");
+                    JOptionPane.showMessageDialog(homeUI, "단어 추가 실패 : 동일 단어가 존재합니다.");
                     return;
                 }
             }
@@ -121,110 +127,6 @@ public class HomeController implements Controller {
         }
     }
 
-    private Object[] showAddWordDialogue() {
-        UIManager.put("OptionPane.background", Color.WHITE);
-        UIManager.put("Panel.background", Color.WHITE);
-        UIManager.put("Label.background", Color.WHITE);
-
-        JTextField newWordENGField = new JTextField(20);
-        JTextField newWordKORField = new JTextField(20);
-        JTextField newWordEXField = new JTextField(20);
-
-        JLabel AddWordText = new JLabel("Add New Word");
-        AddWordText.setFont(new Font("맑은 고딕", Font.BOLD, 18));
-        JPanel rootAddWordText = new JPanel(new GridBagLayout());
-        rootAddWordText.add(AddWordText);
-        MakePrettyInterface.makeWhite(rootAddWordText);
-
-        JPanel basePanel = new JPanel(new GridBagLayout());
-        MakePrettyInterface.makeWhite(basePanel);
-        MakePrettyInterface.setFixedSize(basePanel, 450, 300);
-
-        JPanel addWordPanel = new JPanel();
-        addWordPanel.setLayout(new BoxLayout(addWordPanel, BoxLayout.Y_AXIS));
-        MakePrettyInterface.makeWhite(addWordPanel);
-        basePanel.add(addWordPanel);
-
-        JLabel ENGText = new JLabel("New Word ");
-        ENGText.setFont(new Font("맑은 고딕", Font.BOLD, 12));
-        JPanel ENGFlow = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        MakePrettyInterface.makeWhite(ENGFlow);
-        MakePrettyInterface.makeShadow(newWordENGField, false);
-        ENGFlow.add(ENGText);
-        ENGFlow.add(newWordENGField);
-
-        JLabel KORText = new JLabel("New Meaning ");
-        KORText.setFont(new Font("맑은 고딕", Font.BOLD, 12));
-        JPanel KORFlow = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        MakePrettyInterface.makeWhite(KORFlow);
-        MakePrettyInterface.makeShadow(newWordENGField, false);
-        KORFlow.add(KORText);
-        KORFlow.add(newWordKORField);
-
-        JLabel EXText = new JLabel("New Example ");
-        EXText.setFont(new Font("맑은 고딕", Font.BOLD, 12));
-        JPanel EXFlow = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        MakePrettyInterface.makeWhite(EXFlow);
-        MakePrettyInterface.makeShadow(newWordENGField, false);
-        EXFlow.add(EXText);
-        EXFlow.add(newWordEXField);
-
-        JButton btnAdd = new JButton("추가");
-        MakePrettyInterface.setFixedSize(btnAdd, 50, 20);
-        btnAdd.setFont(new Font("맑은 고딕", Font.BOLD, 12));
-        JButton btnCancel = new JButton("취소");
-        MakePrettyInterface.setFixedSize(btnCancel, 50, 20);
-        btnCancel.setFont(new Font("맑은 고딕", Font.BOLD, 12));
-
-        btnAdd.setBackground(Color.WHITE);
-        btnCancel.setBackground(Color.WHITE);
-        MakePrettyInterface.makeShadow(btnAdd, false);
-        MakePrettyInterface.makeShadow(btnCancel, false);
-        btnAdd.setFocusPainted(false);
-        btnCancel.setFocusPainted(false);
-
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
-        MakePrettyInterface.makeWhite(buttonPanel);
-        buttonPanel.add(btnAdd);
-        buttonPanel.add(btnCancel);
-
-        addWordPanel.add(rootAddWordText);
-        addWordPanel.add(Box.createVerticalStrut(30));
-        addWordPanel.add(ENGFlow);
-        addWordPanel.add(Box.createVerticalStrut(5));
-        addWordPanel.add(KORFlow);
-        addWordPanel.add(Box.createVerticalStrut(5));
-        addWordPanel.add(EXFlow);
-        addWordPanel.add(Box.createVerticalStrut(10));
-        addWordPanel.add(buttonPanel);
-
-        final int[] resultState = {JOptionPane.CANCEL_OPTION};
-
-        btnAdd.addActionListener(e -> {
-            resultState[0] = JOptionPane.OK_OPTION;
-            Window w = SwingUtilities.getWindowAncestor(btnAdd);
-            if (w != null) w.dispose();
-        });
-
-        btnCancel.addActionListener(e -> {
-            resultState[0] = JOptionPane.CANCEL_OPTION;
-            Window w = SwingUtilities.getWindowAncestor(btnCancel);
-            if (w != null) w.dispose();
-        });
-
-        JOptionPane.showOptionDialog(
-                homeUI,
-                basePanel,
-                "Add Word",
-                JOptionPane.DEFAULT_OPTION,
-                JOptionPane.PLAIN_MESSAGE,
-                null,
-                new Object[]{},
-                null
-        );
-
-        return new Object[]{newWordENGField, newWordKORField,newWordEXField, resultState[0]};
-    }
 
     private void handleSearch(Object payload) {
         String query = payload == null ? "" : payload.toString();
@@ -239,7 +141,6 @@ public class HomeController implements Controller {
                 .collect(Collectors.toCollection(Vector::new));
         homeUI.updateWords(filtered);
     }
-
     private boolean matches(Word word, String query) {
         if (word == null) {
             return false;
@@ -256,6 +157,84 @@ public class HomeController implements Controller {
         }
         return false;
     }
+
+    private void handleAdd(Word word) {
+        Object[] inputData = homeUI.showAddDialogue(word);
+        handleAddJudgement(inputData);
+    }
+    private void handleAddJudgement(Object[] data) {
+        JTextField newENGField = (JTextField) data[0];
+        JTextField newKORField = (JTextField) data[1];
+        JTextField newEXField = (JTextField) data[2];
+        int result = (int) data[3];
+        Word word = (Word) data[4];
+
+        String eng = newENGField.getText().trim();
+        String kor = newKORField.getText();
+        String ex = newEXField.getText();
+
+        if (result == JOptionPane.OK_OPTION) {
+            if(vocabulary.isEmpty()){
+                JOptionPane.showMessageDialog(homeUI, "단어 변경 실패 : 단어장이 비어있습니다.");
+                return;
+            }
+            if (eng == null || kor == null) {
+                JOptionPane.showMessageDialog(homeUI, "단어 변경 실패 : 아예 비어있습니다.");
+                return;
+            }
+            if (!eng.isEmpty()) {
+                word.setEng(eng);
+            }
+
+            if (!kor.isEmpty()) {
+                word.setKor(wordManagement.splitKor(kor));
+            }
+
+            if (ex.isEmpty()) {
+                word.setEx("");
+            } else {
+                word.setEx(ex);
+            }
+
+            homeUI.updateWords(vocabulary);
+            if (userFileInfo != null) {
+                FileManagement.saveVoca(vocabulary, userFileInfo.getVocaFilePath());
+            } else {
+                JOptionPane.showMessageDialog(homeUI, "사용자 정보가 없어 파일로 저장하지 못했습니다.");
+            }
+            JOptionPane.showMessageDialog(homeUI, "단어 변경 성공 : " + word);
+        }
+
+        if (result == JOptionPane.NO_OPTION) {
+            if (vocabulary.isEmpty()) {
+                JOptionPane.showMessageDialog(homeUI, "단어 삭제 실패 : 단어장이 비어있습니다.");
+                return;
+            }
+
+            if (word == null) {
+                return;
+            }
+            Object[] inputData = homeUI.showRemoveDialogue(word);
+            handleAddRemoveJudgement(inputData);
+        }
+    }
+
+    private void handleAddRemoveJudgement(Object[] data) {
+        int result = (int) data[0];
+        Word word = (Word) data[1];
+        if(result == JOptionPane.OK_OPTION){
+            vocabulary.remove(word);
+
+            homeUI.updateWords(vocabulary);
+            if (userFileInfo != null) {
+                FileManagement.saveVoca(vocabulary, userFileInfo.getVocaFilePath());
+            } else {
+                JOptionPane.showMessageDialog(homeUI, "사용자 정보가 없어 파일로 저장하지 못했습니다.");
+            }
+            JOptionPane.showMessageDialog(homeUI, "단어 삭제 성공 : "+word.getEng()+"를 삭제했습니다");
+        }
+    }
+
 
     public void updateVocabulary(Vector<Word> newVocabulary) {
         this.vocabulary = new Vector<>(newVocabulary);

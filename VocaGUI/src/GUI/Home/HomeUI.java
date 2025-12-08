@@ -1,20 +1,9 @@
 package GUI.Home;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
+import java.awt.*;
 import java.util.Vector;
 
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -127,7 +116,7 @@ public class HomeUI extends JPanel {
         plusButton.setOpaque(true);
         plusButton.setBorder(null);
         plusButton.setFocusPainted(false);
-        plusButton.addActionListener(e -> sendSignal(HomeSignal.ADD, word));
+        plusButton.addActionListener(e -> sendSignal(HomeSignal.FIX, word));
 
         panel.add(plusButton, BorderLayout.EAST);
 
@@ -162,6 +151,322 @@ public class HomeUI extends JPanel {
     // 사이드 메뉴 인스턴스를 반환
     public SideMenu getSideMenu() {
         return sideMenu;
+    }
+
+    public Object[] showAddWordDialogue() {
+        UIManager.put("OptionPane.background", Color.WHITE);
+        UIManager.put("Panel.background", Color.WHITE);
+        UIManager.put("Label.background", Color.WHITE);
+
+        JTextField newWordENGField = new JTextField(20);
+        JTextField newWordKORField = new JTextField(20);
+        JTextField newWordEXField = new JTextField(20);
+
+        JLabel AddWordText = new JLabel("Add New Word");
+        AddWordText.setFont(new Font("맑은 고딕", Font.BOLD, 18));
+        JPanel rootAddWordText = new JPanel(new GridBagLayout());
+        rootAddWordText.add(AddWordText);
+        MakePrettyInterface.makeWhite(rootAddWordText);
+
+        JPanel basePanel = new JPanel(new GridBagLayout());
+        MakePrettyInterface.makeWhite(basePanel);
+        MakePrettyInterface.setFixedSize(basePanel, 450, 300);
+
+        JPanel addWordPanel = new JPanel();
+        addWordPanel.setLayout(new BoxLayout(addWordPanel, BoxLayout.Y_AXIS));
+        MakePrettyInterface.makeWhite(addWordPanel);
+        basePanel.add(addWordPanel);
+
+        JLabel ENGText = new JLabel("New Word ");
+        ENGText.setFont(new Font("맑은 고딕", Font.BOLD, 12));
+        JPanel ENGFlow = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        MakePrettyInterface.makeWhite(ENGFlow);
+        MakePrettyInterface.makeShadow(newWordENGField, false);
+        ENGFlow.add(ENGText);
+        ENGFlow.add(newWordENGField);
+
+        JLabel KORText = new JLabel("New Meaning ");
+        KORText.setFont(new Font("맑은 고딕", Font.BOLD, 12));
+        JPanel KORFlow = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        MakePrettyInterface.makeWhite(KORFlow);
+        MakePrettyInterface.makeShadow(newWordENGField, false);
+        KORFlow.add(KORText);
+        KORFlow.add(newWordKORField);
+
+        JLabel EXText = new JLabel("New Example ");
+        EXText.setFont(new Font("맑은 고딕", Font.BOLD, 12));
+        JPanel EXFlow = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        MakePrettyInterface.makeWhite(EXFlow);
+        MakePrettyInterface.makeShadow(newWordENGField, false);
+        EXFlow.add(EXText);
+        EXFlow.add(newWordEXField);
+
+        JButton btnAdd = new JButton("추가");
+        MakePrettyInterface.setFixedSize(btnAdd, 50, 20);
+        btnAdd.setFont(new Font("맑은 고딕", Font.BOLD, 12));
+        JButton btnCancel = new JButton("취소");
+        MakePrettyInterface.setFixedSize(btnCancel, 50, 20);
+        btnCancel.setFont(new Font("맑은 고딕", Font.BOLD, 12));
+
+        btnAdd.setBackground(Color.WHITE);
+        btnCancel.setBackground(Color.WHITE);
+        MakePrettyInterface.makeShadow(btnAdd, false);
+        MakePrettyInterface.makeShadow(btnCancel, false);
+        btnAdd.setFocusPainted(false);
+        btnCancel.setFocusPainted(false);
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        MakePrettyInterface.makeWhite(buttonPanel);
+        buttonPanel.add(btnAdd);
+        buttonPanel.add(btnCancel);
+
+        addWordPanel.add(rootAddWordText);
+        addWordPanel.add(Box.createVerticalStrut(30));
+        addWordPanel.add(ENGFlow);
+        addWordPanel.add(Box.createVerticalStrut(5));
+        addWordPanel.add(KORFlow);
+        addWordPanel.add(Box.createVerticalStrut(5));
+        addWordPanel.add(EXFlow);
+        addWordPanel.add(Box.createVerticalStrut(10));
+        addWordPanel.add(buttonPanel);
+
+        final int[] resultState = {JOptionPane.CANCEL_OPTION};
+
+        btnAdd.addActionListener(e -> {
+            resultState[0] = JOptionPane.OK_OPTION;
+            Window w = SwingUtilities.getWindowAncestor(btnAdd);
+            if (w != null) w.dispose();
+        });
+
+        btnCancel.addActionListener(e -> {
+            resultState[0] = JOptionPane.CANCEL_OPTION;
+            Window w = SwingUtilities.getWindowAncestor(btnCancel);
+            if (w != null) w.dispose();
+        });
+
+        JOptionPane.showOptionDialog(
+                this,
+                basePanel,
+                "Add Word",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                new Object[]{},
+                null
+        );
+
+        return new Object[]{newWordENGField, newWordKORField,newWordEXField, resultState[0]};
+    }
+
+    public Object[] showAddDialogue(Word data){
+
+        UIManager.put("OptionPane.background", Color.WHITE);
+        UIManager.put("Panel.background", Color.WHITE);
+        UIManager.put("Label.background", Color.WHITE);
+
+        JTextField newWordENGField = new JTextField(20);
+        newWordENGField.setText(data.getEng());
+        JTextField newWordKORField = new JTextField(20);
+        String result = String.join(", ", data.getKor());
+        newWordKORField.setText(result);
+        JTextField newWordEXField = new JTextField(20);
+        newWordEXField.setText(data.getEx());
+
+        JLabel AddWordText = new JLabel("Fix Word");
+        AddWordText.setFont(new Font("맑은 고딕", Font.BOLD, 18));
+        JPanel rootAddWordText = new JPanel(new GridBagLayout());
+        rootAddWordText.add(AddWordText);
+        MakePrettyInterface.makeWhite(rootAddWordText);
+
+        JPanel basePanel = new JPanel(new GridBagLayout());
+        MakePrettyInterface.makeWhite(basePanel);
+        MakePrettyInterface.setFixedSize(basePanel, 450, 300);
+
+        JPanel addWordPanel = new JPanel();
+        addWordPanel.setLayout(new BoxLayout(addWordPanel, BoxLayout.Y_AXIS));
+        MakePrettyInterface.makeWhite(addWordPanel);
+        basePanel.add(addWordPanel);
+
+        JLabel ENGText = new JLabel("Word ");
+        ENGText.setFont(new Font("맑은 고딕", Font.BOLD, 12));
+        JPanel ENGFlow = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        MakePrettyInterface.makeWhite(ENGFlow);
+        MakePrettyInterface.makeShadow(newWordENGField, false);
+        ENGFlow.add(ENGText);
+        ENGFlow.add(newWordENGField);
+
+        JLabel KORText = new JLabel("Meaning ");
+        KORText.setFont(new Font("맑은 고딕", Font.BOLD, 12));
+        JPanel KORFlow = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        MakePrettyInterface.makeWhite(KORFlow);
+        MakePrettyInterface.makeShadow(newWordENGField, false);
+        KORFlow.add(KORText);
+        KORFlow.add(newWordKORField);
+
+        JLabel EXText = new JLabel("Example ");
+        EXText.setFont(new Font("맑은 고딕", Font.BOLD, 12));
+        JPanel EXFlow = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        MakePrettyInterface.makeWhite(EXFlow);
+        MakePrettyInterface.makeShadow(newWordENGField, false);
+        EXFlow.add(EXText);
+        EXFlow.add(newWordEXField);
+
+        JButton btnAdd = new JButton("변경");
+        MakePrettyInterface.setFixedSize(btnAdd, 50, 20);
+        btnAdd.setFont(new Font("맑은 고딕", Font.BOLD, 12));
+        JButton btnRemove = new JButton("삭제");
+        MakePrettyInterface.setFixedSize(btnRemove, 50, 20);
+        btnRemove.setFont(new Font("맑은 고딕", Font.BOLD, 12));
+        JButton btnCancel = new JButton("취소");
+        MakePrettyInterface.setFixedSize(btnCancel, 50, 20);
+        btnCancel.setFont(new Font("맑은 고딕", Font.BOLD, 12));
+
+
+        btnAdd.setBackground(Color.WHITE);
+        btnRemove.setBackground(Color.WHITE);
+        btnCancel.setBackground(Color.WHITE);
+        MakePrettyInterface.makeShadow(btnAdd, false);
+        MakePrettyInterface.makeShadow(btnRemove, false);
+        MakePrettyInterface.makeShadow(btnCancel, false);
+        btnAdd.setFocusPainted(false);
+        btnRemove.setFocusPainted(false);
+        btnCancel.setFocusPainted(false);
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        MakePrettyInterface.makeWhite(buttonPanel);
+        buttonPanel.add(btnAdd);
+        buttonPanel.add(btnRemove);
+        buttonPanel.add(btnCancel);
+
+        addWordPanel.add(rootAddWordText);
+        addWordPanel.add(Box.createVerticalStrut(30));
+        addWordPanel.add(ENGFlow);
+        addWordPanel.add(Box.createVerticalStrut(5));
+        addWordPanel.add(KORFlow);
+        addWordPanel.add(Box.createVerticalStrut(5));
+        addWordPanel.add(EXFlow);
+        addWordPanel.add(Box.createVerticalStrut(10));
+        addWordPanel.add(buttonPanel);
+
+        final int[] resultState = {JOptionPane.CANCEL_OPTION};
+
+        btnAdd.addActionListener(e -> {
+            resultState[0] = JOptionPane.OK_OPTION;
+            Window w = SwingUtilities.getWindowAncestor(btnAdd);
+            if (w != null) w.dispose();
+        });
+
+        btnRemove.addActionListener(e -> {
+            resultState[0] = JOptionPane.NO_OPTION;
+            Window w = SwingUtilities.getWindowAncestor(btnRemove);
+            if (w != null) w.dispose();
+        });
+
+        btnCancel.addActionListener(e -> {
+            resultState[0] = JOptionPane.CANCEL_OPTION;
+            Window w = SwingUtilities.getWindowAncestor(btnCancel);
+            if (w != null) w.dispose();
+        });
+
+        JOptionPane.showOptionDialog(
+                this,
+                basePanel,
+                "Add Word",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                new Object[]{},
+                null
+        );
+        return new Object[]{newWordENGField, newWordKORField, newWordEXField, resultState[0],data};
+    }
+
+    public Object[] showRemoveDialogue(Word data){
+        UIManager.put("OptionPane.background", Color.WHITE);
+        UIManager.put("Panel.background", Color.WHITE);
+        UIManager.put("Label.background", Color.WHITE);
+
+        JLabel RemoveText = new JLabel("Remove Word");
+        RemoveText.setFont(new Font("맑은 고딕", Font.BOLD, 18));
+        JPanel rootAddWordText = new JPanel(new GridBagLayout());
+        rootAddWordText.add(RemoveText);
+        MakePrettyInterface.makeWhite(rootAddWordText);
+
+        JLabel QText = new JLabel("다음 단어를 진짜 삭제하시겠습니까?");
+        QText.setFont(new Font("맑은 고딕", Font.BOLD, 12));
+        JPanel QFlow = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        MakePrettyInterface.makeWhite(QFlow);
+        QFlow.add(QText);
+
+        JLabel WordText = new JLabel(data.toString());
+        WordText.setFont(new Font("맑은 고딕", Font.BOLD, 12));
+        JPanel WordFlow = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        MakePrettyInterface.makeWhite(WordFlow);
+        WordFlow.add(WordText);
+
+        JButton btnRemove = new JButton("삭제");
+        MakePrettyInterface.setFixedSize(btnRemove, 50, 20);
+        btnRemove.setFont(new Font("맑은 고딕", Font.BOLD, 12));
+        JButton btnCancel = new JButton("취소");
+        MakePrettyInterface.setFixedSize(btnCancel, 50, 20);
+        btnCancel.setFont(new Font("맑은 고딕", Font.BOLD, 12));
+
+        btnRemove.setBackground(Color.WHITE);
+        btnCancel.setBackground(Color.WHITE);
+        MakePrettyInterface.makeShadow(btnRemove, false);
+        MakePrettyInterface.makeShadow(btnCancel, false);
+        btnRemove.setFocusPainted(false);
+        btnCancel.setFocusPainted(false);
+
+        final int[] resultState = {JOptionPane.CANCEL_OPTION};
+
+        btnRemove.addActionListener(e -> {
+            resultState[0] = JOptionPane.OK_OPTION;
+            Window w = SwingUtilities.getWindowAncestor(btnRemove);
+            if (w != null) w.dispose();
+        });
+
+        btnCancel.addActionListener(e -> {
+            resultState[0] = JOptionPane.CANCEL_OPTION;
+            Window w = SwingUtilities.getWindowAncestor(btnCancel);
+            if (w != null) w.dispose();
+        });
+
+
+        JPanel basePanel = new JPanel(new GridBagLayout());
+        MakePrettyInterface.makeWhite(basePanel);
+        MakePrettyInterface.setFixedSize(basePanel, 350, 200);
+
+        JPanel addWordPanel = new JPanel();
+        addWordPanel.setLayout(new BoxLayout(addWordPanel, BoxLayout.Y_AXIS));
+        MakePrettyInterface.makeWhite(addWordPanel);
+        basePanel.add(addWordPanel);
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        MakePrettyInterface.makeWhite(buttonPanel);
+        buttonPanel.add(btnRemove);
+        buttonPanel.add(btnCancel);
+
+        addWordPanel.add(rootAddWordText);
+        addWordPanel.add(Box.createVerticalStrut(30));
+        addWordPanel.add(QFlow);
+        addWordPanel.add(Box.createVerticalStrut(5));
+        addWordPanel.add(WordFlow);
+        addWordPanel.add(buttonPanel);
+
+        JOptionPane.showOptionDialog(
+                this,
+                basePanel,
+                "Remove",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                new Object[]{},
+                null
+        );
+
+        return new Object[]{resultState[0],data};
+
     }
 
     // 홈 화면을 확인하기 위한 테스트 메인
