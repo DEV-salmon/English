@@ -19,8 +19,6 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import GUI.Login.LoginController;
-import GUI.Login.LoginUI;
 import Test.ExampleVector;
 import Utill.MakePrettyInterface;
 import Signal.Controller;
@@ -77,7 +75,7 @@ public class HomeUI extends JPanel {
             
         });
 
-        JButton searchBtn = new JButton("+");
+        JButton searchBtn = new JButton("...");
         searchBtn.setFont(new Font("Arial", Font.BOLD, 30));
         MakePrettyInterface.setFixedSize(searchBtn, 50, 50);
         searchBtn.addActionListener(e -> sendSignal(HomeSignal.ADD_WORD, searchField.getText()));
@@ -111,12 +109,16 @@ public class HomeUI extends JPanel {
         panel.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
         panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
 
-        String labelText = word.getEng() + " : " + String.join(", ", word.getKor());
+
+        String exText = word.getEx() == null ? "" : " - 예문 : " + word.getEx();
+        String labelText = word.getEng() + " : " + String.join(", ", word.getKor())+exText;
+
+
         JLabel label = new JLabel(labelText);
         label.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
         panel.add(label, BorderLayout.CENTER);
 
-        JButton plusButton = new JButton("···");
+        JButton plusButton = new JButton("+");
         plusButton.setFont(new Font("Arial", Font.BOLD, 20));
         plusButton.setPreferredSize(new Dimension(30, 30));
         plusButton.setForeground(Color.WHITE);

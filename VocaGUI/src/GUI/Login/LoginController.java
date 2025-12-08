@@ -2,7 +2,6 @@ package GUI.Login;
 
 import javax.swing.*;
 
-import GUI.Home.HomeUI;
 import GUI.Main.GlobalSignal;
 import Signal.Controller;
 import Signal.Signal;
@@ -19,7 +18,6 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagLayout;
-import java.security.Identity;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Vector;
@@ -30,8 +28,6 @@ public class LoginController implements Controller {
     private static final String loginFilePath = "Voca/src/res/LoginList";
     private final LogInManagement logInManagement = new LogInManagement(loginFilePath);
     private static final String USER_VOCA_DIR = "Voca/src/res/Vocas";
-
-
 
     public LoginController() {
         this(null);
@@ -90,7 +86,6 @@ public class LoginController implements Controller {
         }
 
         if (loginList.isEmpty()) {
-            //System.out.println("회원가입이 된 아이디가 없습니다.\n");
             handleLoginFail(username);
             return;
         }
@@ -101,19 +96,15 @@ public class LoginController implements Controller {
                 if (login.getUserid().equals(username)) {
                     String hashedInput = LogInManagement.PasswordUtil.hashPassword(PasswordString, login.getSalt());
                     if (login.getHashedpassword().equals(hashedInput)) {
-                        //System.out.println("로그인이 완료되었습니다.\n");
                         UserFileInfo userInfo = new UserFileInfo(login.getUserid(), USER_VOCA_DIR);
-                        Voca voca = new Voca(userInfo);
-                        handleLoginSuccess(voca);
+                        handleLoginSuccess(userInfo);
                         return;
                     } else {
-                        //System.out.println("비밀번호가 일치 하지 않습니다.\n");
                         handleLoginFail(username);
                         return;
                     }
                 }
             }
-            //System.out.println("존재하지 않는 아이디 입니다..\n");
             handleLoginFail(username);
         } catch (NoSuchAlgorithmException e) {
             System.err.println("인증 알고리즘 오류 발생: " + e.getMessage());
@@ -124,14 +115,11 @@ public class LoginController implements Controller {
     }
 
     private void handleLoginSuccess(Object data) {
-        System.out.println("DEBUG: handleLoginSuccess 메서드 호출됨");
         sendToHandler(GlobalSignal.HOME, data);
     }
 
     private void handleLoginFail(Object data) {
-        System.out.println("DEBUG: handleLoginFail 메서드 호출됨");
         JOptionPane.showMessageDialog(loginUI, "로그인 실패: 아이디와 비밀번호를 확인하세요.");
-
     }
 
     private void handleRegister(Object data) {
@@ -139,10 +127,10 @@ public class LoginController implements Controller {
 
         Object[] inputData = showRegisterDialogue();
 
-        handleRegisterJudgment(inputData);
+        handleRegisterJudgement(inputData);
     }
 
-    private void handleRegisterJudgment(Object[] data){
+    private void handleRegisterJudgement(Object[] data){
         JTextField usernameField = (JTextField) data[0];
         JPasswordField passwordField = (JPasswordField) data[1];
         int result = (int) data[2];
