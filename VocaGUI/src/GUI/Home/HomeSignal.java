@@ -7,6 +7,6 @@ public enum HomeSignal implements Signal {
     ADD_WORD,
     CHANGE_TEXT_FIELD,
     VIEW_MORE_INFO,
-    ADD,
+    FIX,
     DELETE
 }
