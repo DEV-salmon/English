@@ -1,25 +1,11 @@
 {
+    "java.project.sourcePaths": [
+        "VocaGUI/src",
+        "Voca/src"
+    ],
     "java.project.referencedLibraries": [
-        "lib/**/*.jar",
-        "Voca/src/lib/cmu_time_awb.jar",
-        "Voca/src/lib/cmu_us_kal.jar",
-        "Voca/src/lib/cmudict04.jar",
-        "Voca/src/lib/cmulex.jar",
-        "Voca/src/lib/cmutimelex.jar",
-        "Voca/src/lib/en_us.jar",
-        "Voca/src/lib/freetts-jsapi10.jar",
-        "Voca/src/lib/freetts.jar",
-        "Voca/src/lib/mbrola.jar",
-        "/Users/hyeonseongbin/Downloads/jfreechart-1.0.19/lib/hamcrest-core-1.3.jar",
-        "/Users/hyeonseongbin/Downloads/jfreechart-1.0.19/lib/jcommon-1.0.23.jar",
-        "/Users/hyeonseongbin/Downloads/jfreechart-1.0.19/lib/jfreechart-1.0.19-experimental.jar",
-        "/Users/hyeonseongbin/Downloads/jfreechart-1.0.19/lib/jfreechart-1.0.19-swt.jar",
-        "/Users/hyeonseongbin/Downloads/jfreechart-1.0.19/lib/jfreechart-1.0.19.jar",
-        "/Users/hyeonseongbin/Downloads/jfreechart-1.0.19/lib/jfreesvg-2.0.jar",
-        "/Users/hyeonseongbin/Downloads/jfreechart-1.0.19/lib/junit-4.11.jar",
-        "/Users/hyeonseongbin/Downloads/jfreechart-1.0.19/lib/orsoncharts-1.4-eval-nofx.jar",
-        "/Users/hyeonseongbin/Downloads/jfreechart-1.0.19/lib/orsonpdf-1.6-eval.jar",
-        "/Users/hyeonseongbin/Downloads/jfreechart-1.0.19/lib/servlet.jar",
-        "/Users/hyeonseongbin/Downloads/jfreechart-1.0.19/lib/swtgraphics2d.jar"
+        "VocaGUI/lib/**/*.jar",
+        "Voca/src/lib/**/*.jar",
+        "lib/**/*.jar"
     ]
 }
