@@ -4,7 +4,7 @@ import java.awt.CardLayout;
 import java.util.Vector;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
+
 import GUI.Home.HomeController;
 import GUI.Home.HomeSignal;
 import GUI.Login.LoginController;
@@ -15,9 +15,10 @@ import Signal.Controller;
 import Signal.Signal;
 import GUI.Stat.StatController;
 import Test.ExampleVector;
-import GUI.Main.GlobalSignal;
 import voca.app.Voca;
+import voca.core.UserFileInfo;
 import voca.core.Word;
+import voca.management.FileManagement;
 
 public class MainController implements Controller {
     private static final String CARD_LOGIN = "login";
@@ -94,9 +95,12 @@ public class MainController implements Controller {
                 homeController.send(HomeSignal.TOGGLE_MENU, null);
                 break;
             case HOME:
-                if (data instanceof Voca voca) {
+                if (data instanceof UserFileInfo userFileInfo) {
+                    Voca voca = new Voca(userFileInfo);
                     Vector<Word> userVocabulary = voca.getVoca();
+                    homeController.updateUserFileInfo(userFileInfo);
                     homeController.updateVocabulary(userVocabulary);
+                    FileManagement.saveVoca(voca.getVoca(),userFileInfo.getUserDirectory());
                 }
                 showHome();
                 break;

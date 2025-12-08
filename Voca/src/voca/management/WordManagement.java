@@ -210,7 +210,7 @@ public class WordManagement extends BaseMenu{
     /**
      * 단어 철자를 대소문자 무시하고 찾아 반환합니다.
      */
-    private Word findWord(String eng){
+    public Word findWord(String eng){
         for(Word word : voca){
             if(word.getEng().equalsIgnoreCase(eng)){
                 return word;
@@ -250,7 +250,7 @@ public class WordManagement extends BaseMenu{
     /**
      * 공백을 허용하지 않는 한 줄 입력을 반복해 받습니다.
      */
-    private String requestNonEmptyLine(){
+    public String requestNonEmptyLine(){
         while(true){
             String line = scanner.nextLine().trim();
             if(line.isEmpty()){
@@ -264,7 +264,7 @@ public class WordManagement extends BaseMenu{
     /**
      * 콤마로 구분된 한국어 뜻을 잘라 깨끗하게 배열로 만듭니다.
      */
-    private String[] splitKor(String korLine){
+    public String[] splitKor(String korLine){
         String[] korArray = korLine.split(",");
         List<String> cleaned = new ArrayList<>();
         for(String kor : korArray){
