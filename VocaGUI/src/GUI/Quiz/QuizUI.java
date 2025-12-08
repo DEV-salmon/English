@@ -31,8 +31,7 @@ public class QuizUI extends JPanel {
     private final JButton korToEngQuiz;
     private final JButton exQuiz;
     private final JComboBox<Integer> QuizNumber;
-    private final JButton subjectQuiz;
-    private final JButton objectQuiz;
+
     private Font btnFont = new Font("맑은 고딕",Font.BOLD,12);
 
     public QuizUI(Controller signalHandler) {
@@ -85,8 +84,7 @@ public class QuizUI extends JPanel {
 
         Integer[] nums = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
         QuizNumber = new JComboBox<Integer>(nums);
-        subjectQuiz = new JButton("주관식 퀴즈");
-        objectQuiz = new JButton("객관식 퀴즈");
+        
 
         add(sideMenu, BorderLayout.WEST);
         add(contentPanel, BorderLayout.CENTER);
@@ -135,4 +133,5 @@ public class QuizUI extends JPanel {
     public JButton getKorToEngQuizButton() {
         return korToEngQuiz;
     }
+
 }

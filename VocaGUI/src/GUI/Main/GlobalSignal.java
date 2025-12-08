@@ -7,6 +7,7 @@ public enum GlobalSignal implements Signal {
     FILE,
     STAT,
     QUIZ,
+    INCORRECT,
     LOGOUT,
     TOGGLE_MENU
 }

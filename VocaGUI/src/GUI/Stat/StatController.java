@@ -67,10 +67,15 @@ public class StatController implements Controller {
 
     public void updateUserInfo(UserFileInfo userInfo) {
         if (userInfo == null) {
+            statManager = null;
             statUI.showMessage("유효하지 않은 사용자 정보입니다.");
             return;
         }
         this.statManager = new StatManagement(userInfo);
+    }
+
+    public StatManagement getStatManager() {
+        return statManager;
     }
 
     public void toggleMenu() {

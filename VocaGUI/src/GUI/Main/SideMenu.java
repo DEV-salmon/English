@@ -18,6 +18,7 @@ public class SideMenu extends JPanel {
     private final JButton fileButton = createMenuButton("File");
     private final JButton statButton = createMenuButton("Stat");
     private final JButton quizButton = createMenuButton("Quiz");
+    private final JButton incorrectButton = createMenuButton("InCorrect");
     private final JButton logoutButton = createMenuButton("Log out");
 
     private final JButton toggleButton = createToggleButton();
@@ -46,6 +47,10 @@ public class SideMenu extends JPanel {
         add(statButton);
         add(createSeparator());
         statButton.addActionListener(e -> send(GlobalSignal.STAT, null));
+
+        add(incorrectButton);
+        add(createSeparator());
+        incorrectButton.addActionListener(e -> send(GlobalSignal.INCORRECT, null));
 
         add(quizButton);
         add(Box.createVerticalGlue());
@@ -102,6 +107,11 @@ public class SideMenu extends JPanel {
     // 퀴즈 버튼을 반환
     public JButton getQuizButton() {
         return quizButton;
+    }
+
+    // 오답 버튼을 반환
+    public JButton getIncorrectButton() {
+        return incorrectButton;
     }
 
     // 로그아웃 버튼을 반환

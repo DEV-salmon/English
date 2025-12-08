@@ -203,9 +203,24 @@ public class IncorrectManagement extends BaseMenu {
     /**
      * 현 시점의 오답 목록 스냅샷을 반환합니다.
      */
-    private Vector<IncorrectWord> getIncorrectWordsSnapshot(){
+    public Vector<IncorrectWord> getIncorrectWordsSnapshot(){
         initializeIncorrectNotes();
         return new Vector<>(notes);
+    }
+
+    /**
+     * GUI용 오답 노트를 모두 삭제합니다.
+     */
+    public void clearAll(){
+        ensureFile();
+        try(PrintWriter writer = new PrintWriter(new FileWriter(incorrectFilePath))){
+            writer.print("");
+            notes.clear();
+            noteKeys.clear();
+        }
+        catch (IOException e){
+            System.out.println("오답 노트를 초기화하는 동안 오류가 발생했습니다 : "+e.getMessage());
+        }
     }
 
     /**
@@ -318,5 +333,9 @@ public class IncorrectManagement extends BaseMenu {
             return "";
         }
         return value;
+    }
+
+    public String getIncorrectFilePath() {
+        return incorrectFilePath;
     }
 }
