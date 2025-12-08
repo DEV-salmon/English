@@ -31,7 +31,7 @@ public class HomeUI extends JPanel {
     private final JPanel listContainer;
     private final JTextField searchField;
     private final Controller signalHandler;
-
+    private Boolean firstFocus = false;
     // 단어 목록을 받아 홈 화면을 구성하는 생성자
     public HomeUI(Vector<Word> voca, Controller signalHandler) {
         this.signalHandler = signalHandler;
@@ -50,7 +50,7 @@ public class HomeUI extends JPanel {
         topPanel.setBackground(Color.WHITE);
 
         JButton menuBtn = sideMenu.getToggleButton();
-
+        
         searchField = new JTextField(" 입력하세요");
         searchField.setFont(new Font("맑은 고딕", Font.PLAIN, 16));
         MakePrettyInterface.setFixedSize(searchField, 400, 50);
@@ -70,6 +70,7 @@ public class HomeUI extends JPanel {
                 detectChange();
             }
             private void detectChange(){ 
+                firstFocus = true;
                 signalHandler.send(HomeSignal.CHANGE_TEXT_FIELD, searchField.getText());
             }
             
