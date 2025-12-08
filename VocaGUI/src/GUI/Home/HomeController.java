@@ -76,8 +76,6 @@ public class HomeController implements Controller {
         }
     }
 
-
-
     private void toggleMenu() {
         menuVisible = !menuVisible;
         homeUI.setSideMenuVisible(menuVisible);

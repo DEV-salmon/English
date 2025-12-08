@@ -9,5 +9,6 @@ public enum GlobalSignal implements Signal {
     QUIZ,
     INCORRECT,
     LOGOUT,
-    TOGGLE_MENU
+    TOGGLE_MENU,
+    UPDATE_VOCA
 }

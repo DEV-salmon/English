@@ -9,6 +9,7 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.Vector;
 
+import voca.core.UserFileInfo;
 import voca.core.Word;
 
 public class FileMenu extends BaseMenu{
@@ -16,6 +17,12 @@ public class FileMenu extends BaseMenu{
     private final Scanner scanner;
     private final Vector<Word> voca;
     private final String userFilePath;
+
+    public FileMenu(UserFileInfo userFileInfo) {
+        this.scanner = null;
+        this.voca = new Vector<>();
+        this.userFilePath = userFileInfo.getVocaFilePath();
+    }
 
     /**
      * 파일 메뉴를 초기화합니다.
@@ -105,7 +112,7 @@ public class FileMenu extends BaseMenu{
     /**
      * 단어장 파일 절대 경로를 검증하며 입력받습니다.
      */
-    private String requestPath(){
+    public String requestPath(){
         while(true){
             System.out.print("절대 경로를 입력해주세요 : ");
             String path = scanner.nextLine().trim();
@@ -129,7 +136,7 @@ public class FileMenu extends BaseMenu{
     /**
      * 현재 단어장 파일을 백업합니다.
      */
-    private String createBackup(){
+    public String createBackup(){
         try{
             File source = new File(userFilePath);
             if(!source.exists()){
@@ -148,7 +155,7 @@ public class FileMenu extends BaseMenu{
     /**
      * 간단한 파일 복사 메서드입니다. (하드코딩된 버퍼 사용)
      */
-    private void copyFile(File source, File target) throws IOException{
+    public void copyFile(File source, File target) throws IOException{
         try(FileInputStream fis = new FileInputStream(source);
             FileOutputStream fos = new FileOutputStream(target)){
             byte[] buffer = new byte[8192];
@@ -242,7 +249,7 @@ public class FileMenu extends BaseMenu{
     /**
      * 단어장 파일 형식을 간단히 검사합니다. (예문은 없어도 됩니다)
      */
-    private boolean validateVocaFormat(String path){
+    public boolean validateVocaFormat(String path){
         try(Scanner sc = new Scanner(new File(path))){
             int lineNo = 0;
             boolean hasError = false;
