@@ -2,7 +2,6 @@ package GUI.File;
 
 import GUI.Main.SideMenu;
 import Signal.Controller;
-import Test.ExampleVector;
 import Utill.MakePrettyInterface;
 
 import javax.swing.*;
@@ -236,16 +235,6 @@ public class FileUI extends JPanel {
         public int getResult() {
             return result;
         }
-    }
-
-    public static void main(String[] args) {
-        ExampleVector v = new ExampleVector();
-        FileController fileController = new FileController(v.voca);
-        JFrame frame = new JFrame();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(600, 800);
-        frame.add(fileController.getView());
-        frame.setVisible(true);
     }
 
 }

@@ -8,7 +8,6 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import Test.ExampleVector;
 import Utill.MakePrettyInterface;
 import Signal.Controller;
 import voca.core.Word;
@@ -481,14 +480,4 @@ public class HomeUI extends JPanel {
         return text == null ? "" : text.trim();
     }
 
-    // 홈 화면을 확인하기 위한 테스트 메인
-    public static void main(String[] args) {
-        ExampleVector v = new ExampleVector();
-        HomeController homeController = new HomeController(v.voca);
-        JFrame frame = new JFrame();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(600, 800);
-        frame.add(homeController.getView());
-        frame.setVisible(true);
-    }
 }
