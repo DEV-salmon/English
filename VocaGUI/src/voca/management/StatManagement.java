@@ -267,4 +267,41 @@ public class StatManagement extends BaseMenu {
     public void saveStatToFileWithWait(Scanner scanner) {
         saveStatToFileWithWait(scanner, "엔터를 누르면 통계를 저장합니다...");
     }
+
+    /**
+     * UI에서 바로 보여줄 수 있는 간단한 통계 요약을 만듭니다.
+     */
+    public String buildSummaryForUi() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("[뜻 → 영어] 맞음 ").append(korEng_correct)
+                .append(" / 틀림 ").append(korEng_wrong)
+                .append(" (정답률 ").append(formatRate(korEng_correct, korEng_wrong)).append(")\n");
+        builder.append("[영어 → 뜻] 맞음 ").append(engKor_correct)
+                .append(" / 틀림 ").append(engKor_wrong)
+                .append(" (정답률 ").append(formatRate(engKor_correct, engKor_wrong)).append(")\n");
+        builder.append("[예문 빈칸] 맞음 ").append(example_correct)
+                .append(" / 틀림 ").append(example_wrong)
+                .append(" (정답률 ").append(formatRate(example_correct, example_wrong)).append(")\n");
+        builder.append("[스펠링] 맞음 ").append(spelling_correct)
+                .append(" / 틀림 ").append(spelling_wrong)
+                .append(" (정답률 ").append(formatRate(spelling_correct, spelling_wrong)).append(")\n");
+        builder.append("\n통계 파일: ").append(statFilePath);
+        builder.append("\n그래프 파일: ").append(getChartFilePath());
+        return builder.toString();
+    }
+
+    /**
+     * 그래프가 저장되는 PNG 파일 경로를 반환합니다.
+     */
+    public String getChartFilePath() {
+        File txtFile = new File(statFilePath);
+        File dir = txtFile.getParentFile();
+        File chartFile = dir == null ? new File("stat.png") : new File(dir, "stat.png");
+        return chartFile.getAbsolutePath();
+    }
+
+    private String formatRate(int c, int w) {
+        double p = mean(c, w) * 100.0;
+        return String.format("%.1f%%", p);
+    }
 }

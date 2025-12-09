@@ -1,23 +1,24 @@
 package GUI.Stat;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-
+import java.awt.Image;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.LineBorder;
+import javax.swing.JButton;
 
 import GUI.Main.SideMenu;
 import Signal.Controller;
@@ -28,10 +29,12 @@ public class StatUI extends JPanel {
     private final Controller signalHandler;
     private final SideMenu sideMenu;
 
-    private final JButton showStatButton;
-    private final JButton saveStatButton;
-    private final JComboBox<String> quizTypeBox;
     private final JTextArea statSummaryArea;
+    private final JLabel chartLabel;
+    private final CardLayout contentCardLayout;
+    private final JPanel contentCardPanel;
+    private static final String CARD_SUMMARY = "SUMMARY";
+    private static final String CARD_CHART = "CHART";
 
     public StatUI(Controller signalHandler) {
         this.signalHandler = signalHandler;
@@ -55,29 +58,16 @@ public class StatUI extends JPanel {
         JLabel titleLabel = new JLabel("Stat Mode");
         titleLabel.setFont(new Font("맑은 고딕", Font.BOLD, 40));
 
-        showStatButton = new JButton("통계 그래프 생성");
-        showStatButton.addActionListener(e -> sendSignal(StatSignal.STAT_SHOW_BUTTON, null));
-        styleButton(showStatButton);
+        JLabel infoLabel = new JLabel("Stat 화면을 열면 통계와 그래프가 자동으로 갱신됩니다.");
+        infoLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
+        infoLabel.setAlignmentX(CENTER_ALIGNMENT);
 
-        saveStatButton = new JButton("통계 파일 저장");
-        saveStatButton.addActionListener(e -> sendSignal(StatSignal.STAT_SAVE_BUTTON, null));
-        styleButton(saveStatButton);
+        JButton summaryButton = new JButton("요약 보기");
+        styleSwitchButton(summaryButton);
+        JButton chartButton = new JButton("그래프 보기");
+        styleSwitchButton(chartButton);
 
-        quizTypeBox = new JComboBox<>(new String[]{
-                "뜻 맞추기 (한→영)",
-                "뜻 맞추기 (영→한)",
-                "예문 퀴즈",
-                "스펠링 퀴즈"
-        });
-        quizTypeBox.addActionListener(e ->
-                sendSignal(StatSignal.STAT_QUIZTYPE_SELECT, quizTypeBox.getSelectedItem())
-        );
-        quizTypeBox.setBackground(Color.WHITE);
-        quizTypeBox.setFont(new Font("맑은 고딕", Font.PLAIN, 13));
-        quizTypeBox.setBorder(new LineBorder(Color.BLACK, 1, true));
-        MakePrettyInterface.setFixedSize(quizTypeBox, 220, 35);
-
-        statSummaryArea = new JTextArea("통계 화면");
+        statSummaryArea = new JTextArea("통계를 불러오는 중입니다...");
         statSummaryArea.setEditable(false);
         statSummaryArea.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
         statSummaryArea.setLineWrap(true);
@@ -89,33 +79,47 @@ public class StatUI extends JPanel {
         summaryScroll.setPreferredSize(new Dimension(440, 220));
         summaryScroll.setAlignmentX(CENTER_ALIGNMENT);
 
-        JPanel quizTypePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 0));
-        MakePrettyInterface.makeWhite(quizTypePanel);
-        JLabel quizTypeLabel = new JLabel("퀴즈 유형");
-        quizTypeLabel.setFont(new Font("맑은 고딕", Font.BOLD, 14));
-        quizTypePanel.add(quizTypeLabel);
-        quizTypePanel.add(quizTypeBox);
-        quizTypePanel.setAlignmentX(CENTER_ALIGNMENT);
+        chartLabel = new JLabel("그래프를 불러오는 중입니다.");
+        chartLabel.setHorizontalAlignment(JLabel.CENTER);
+        chartLabel.setVerticalAlignment(JLabel.CENTER);
+        chartLabel.setBorder(new LineBorder(Color.LIGHT_GRAY, 1, true));
+        chartLabel.setOpaque(true);
+        chartLabel.setBackground(Color.WHITE);
 
-        JPanel actionPanel = new JPanel(new GridLayout(1, 2, 30, 0));
-        MakePrettyInterface.makeWhite(actionPanel);
-        actionPanel.add(showStatButton);
-        actionPanel.add(saveStatButton);
-        actionPanel.setAlignmentX(CENTER_ALIGNMENT);
+        JPanel chartPanel = new JPanel(new GridBagLayout());
+        MakePrettyInterface.makeWhite(chartPanel);
+        chartPanel.add(chartLabel);
+
+        JPanel summaryPanel = new JPanel();
+        summaryPanel.setLayout(new BoxLayout(summaryPanel, BoxLayout.Y_AXIS));
+        MakePrettyInterface.makeWhite(summaryPanel);
+        summaryPanel.add(summaryScroll);
+
+        contentCardLayout = new CardLayout();
+        contentCardPanel = new JPanel(contentCardLayout);
+        contentCardPanel.setBorder(new LineBorder(Color.LIGHT_GRAY, 1, true));
+        contentCardPanel.setPreferredSize(new Dimension(460, 320));
+        contentCardPanel.setBackground(Color.WHITE);
+        contentCardPanel.add(summaryPanel, CARD_SUMMARY);
+        contentCardPanel.add(chartPanel, CARD_CHART);
 
         JPanel statCard = new JPanel();
         statCard.setLayout(new BoxLayout(statCard, BoxLayout.Y_AXIS));
         MakePrettyInterface.makeWhite(statCard);
         statCard.setBorder(new LineBorder(Color.LIGHT_GRAY, 1, true));
-        MakePrettyInterface.setFixedSize(statCard, 500, 420);
-        statCard.setMaximumSize(new Dimension(520, Integer.MAX_VALUE));
+        MakePrettyInterface.setFixedSize(statCard, 520, 520);
+        statCard.setMaximumSize(new Dimension(540, Integer.MAX_VALUE));
         statCard.setAlignmentX(CENTER_ALIGNMENT);
         statCard.add(Box.createVerticalStrut(20));
-        statCard.add(quizTypePanel);
+        statCard.add(infoLabel);
         statCard.add(Box.createVerticalStrut(20));
-        statCard.add(actionPanel);
-        statCard.add(Box.createVerticalStrut(20));
-        statCard.add(summaryScroll);
+        JPanel switchPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 5));
+        MakePrettyInterface.makeWhite(switchPanel);
+        switchPanel.add(summaryButton);
+        switchPanel.add(chartButton);
+        statCard.add(switchPanel);
+        statCard.add(Box.createVerticalStrut(10));
+        statCard.add(contentCardPanel);
         statCard.add(Box.createVerticalGlue());
 
         JPanel centerTopPanel = new JPanel(new GridBagLayout());
@@ -138,6 +142,10 @@ public class StatUI extends JPanel {
 
         add(sideMenu, BorderLayout.WEST);
         add(contentPanel, BorderLayout.CENTER);
+
+        summaryButton.addActionListener(e -> showSummaryCard());
+        chartButton.addActionListener(e -> showChartCard());
+        showSummaryCard();
     }
 
     public void setSideMenuVisible(boolean visible) {
@@ -149,6 +157,39 @@ public class StatUI extends JPanel {
         statSummaryArea.setText(text);
     }
 
+    public void updateChart(String chartPath) {
+        if (chartPath == null) {
+            chartLabel.setIcon(null);
+            chartLabel.setText("그래프를 표시하려면 로그인 후 퀴즈를 풀어주세요.");
+            MakePrettyInterface.updateScreen(this);
+            return;
+        }
+
+        ImageIcon icon = new ImageIcon(chartPath);
+        if (icon.getIconWidth() <= 0 || icon.getIconHeight() <= 0) {
+            chartLabel.setIcon(null);
+            chartLabel.setText("그래프 파일을 찾을 수 없습니다.");
+        } else {
+            int targetWidth = 420;
+            int targetHeight = 260;
+            Image scaled = icon.getImage().getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
+            chartLabel.setPreferredSize(new Dimension(targetWidth, targetHeight));
+            chartLabel.setText("");
+            chartLabel.setIcon(new ImageIcon(scaled));
+        }
+        MakePrettyInterface.updateScreen(this);
+    }
+
+    public void showSummaryCard() {
+        contentCardLayout.show(contentCardPanel, CARD_SUMMARY);
+        MakePrettyInterface.updateScreen(this);
+    }
+
+    public void showChartCard() {
+        contentCardLayout.show(contentCardPanel, CARD_CHART);
+        MakePrettyInterface.updateScreen(this);
+    }
+
     public void showMessage(String message) {
         JOptionPane.showMessageDialog(this, message);
     }
@@ -157,12 +198,12 @@ public class StatUI extends JPanel {
         signalHandler.send(statSignal, payload);
     }
 
-    private void styleButton(JButton button) {
+    private void styleSwitchButton(JButton button) {
         button.setBackground(Color.WHITE);
-        button.setFont(new Font("맑은 고딕", Font.BOLD, 14));
+        button.setFont(new Font("맑은 고딕", Font.BOLD, 13));
         button.setFocusPainted(false);
         button.setBorder(new LineBorder(Color.BLACK, 1, true));
-        MakePrettyInterface.setFixedSize(button, 200, 60);
+        MakePrettyInterface.setFixedSize(button, 120, 36);
         MakePrettyInterface.makeShadow(button, false);
     }
 }

@@ -9,6 +9,7 @@ import GUI.File.FileController;
 import GUI.File.FileSignal;
 import GUI.Home.HomeController;
 import GUI.Home.HomeSignal;
+import GUI.InCorrect.IncorrectController;
 import GUI.Login.LoginController;
 import GUI.Login.LoginSignal;
 import GUI.Quiz.QuizController;
@@ -21,6 +22,7 @@ import voca.app.Voca;
 import voca.core.UserFileInfo;
 import voca.core.Word;
 import voca.management.FileManagement;
+import voca.management.IncorrectManagement;
 
 public class MainController implements Controller {
     private static final String CARD_LOGIN = "login";
@@ -28,17 +30,23 @@ public class MainController implements Controller {
     private static final String CARD_QUIZ = "Quiz";
     private static final String CARD_STAT = "stat";
     private static final String CARD_FILE = "file";
+    private static final String CARD_INCORRECT = "incorrect";
 
     private final HomeController homeController;
     private final LoginController loginController;
     private final StatController statController;
     private final QuizController quizController;
     private final FileController fileController;
+    private final IncorrectController incorrectController;
 
     private final JFrame frame;
     private final JPanel rootPanel;
     private final CardLayout cardLayout;
     private String currentCard = CARD_LOGIN;
+    private Voca currentVoca;
+    private Vector<Word> currentVocaWords = new Vector<>();
+    private UserFileInfo currentUser;
+    private IncorrectManagement incorrectManagement;
     
     public MainController(){
         this.frame = new JFrame("VocaGUI");
@@ -46,17 +54,20 @@ public class MainController implements Controller {
         this.rootPanel = new JPanel(cardLayout);
 
         ExampleVector exampleVector = new ExampleVector();
-        this.homeController = new HomeController(exampleVector.voca, this);
+        this.currentVocaWords = new Vector<>(exampleVector.voca);
+        this.homeController = new HomeController(currentVocaWords, this);
         this.loginController = new LoginController(this);
         this.statController = new StatController(this);
-        this.quizController = new QuizController(exampleVector.voca,this);
-        this.fileController = new FileController(exampleVector.voca,this);
+        this.quizController = new QuizController(currentVocaWords,this);
+        this.fileController = new FileController(currentVocaWords,this);
+        this.incorrectController = new IncorrectController(this);
 
         rootPanel.add(loginController.getView(), CARD_LOGIN);
         rootPanel.add(homeController.getView(), CARD_HOME);
         rootPanel.add(quizController.getView(),CARD_QUIZ);
         rootPanel.add(statController.getView(), CARD_STAT);
         rootPanel.add(fileController.getView(), CARD_FILE);
+        rootPanel.add(incorrectController.getView(), CARD_INCORRECT);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(600, 800);
         frame.setContentPane(rootPanel);
@@ -85,6 +96,11 @@ public class MainController implements Controller {
     private void showStat(){
         cardLayout.show(rootPanel, CARD_STAT);
         currentCard = CARD_STAT;
+    }
+
+    private void showIncorrect(){
+        cardLayout.show(rootPanel, CARD_INCORRECT);
+        currentCard = CARD_INCORRECT;
     }
 
     private void showFile(){
@@ -121,24 +137,17 @@ public class MainController implements Controller {
                 break;
             case HOME:
                 if (data instanceof UserFileInfo userFileInfo) {
-                    Voca voca = new Voca(userFileInfo);
-                    Vector<Word> userVocabulary = voca.getVoca();
-                    homeController.updateUserFileInfo(userFileInfo);
-                    homeController.updateVocabulary(userVocabulary);
-                    statController.updateUserInfo(userFileInfo);
-                    fileController.updateUserInfo(userFileInfo);
-                    FileManagement.saveVoca(voca.getVoca(),userFileInfo.getVocaFilePath());
+                    loadUserContext(userFileInfo);
                 }
                 showHome();
                 break;
-            case UPDATE_VOCA: // 👈 이 부분을 추가 (FileController에서 병합 후 전송됨)
+            case UPDATE_VOCA: 
                 if (data instanceof Vector<?> newVocabulary) {
                     Vector<Word> userVocabulary = (Vector<Word>) newVocabulary;
 
-                    // 1. Home UI 업데이트
+                   
                     homeController.updateVocabulary(userVocabulary);
 
-                    // 2. 💡 FIX 2: 병합된 단어장 데이터를 파일에 저장 (Persistence)
                     if (fileController.getUserFileInfo() != null) {
                         String savePath = fileController.getUserFileInfo().getVocaFilePath();
                         FileManagement.saveVoca(userVocabulary, savePath);
@@ -151,18 +160,50 @@ public class MainController implements Controller {
                 showFile();
                 break;
             case STAT:
+                statController.refreshView();
                 showStat();
                 break;
+            case INCORRECT:
+                incorrectController.refreshList();
+                showIncorrect();
+                break;
             case QUIZ:
+                quizController.showSelect();
                 showQuiz();
                 break;
             case LOGOUT:
                 loginController.resetFields();
+                currentUser = null;
+                currentVoca = null;
+                currentVocaWords.clear();
+                incorrectManagement = null;
+                quizController.updateVocabulary(new Vector<>());
+                quizController.setIncorrectManagement(null);
+                quizController.setIncorrectUpdateListener(null);
+                quizController.setStatManagement(null);
+                incorrectController.setIncorrectManagement(null);
                 showLogin();
                 break;
             default:
                 break;
         }
+    }
+
+    private void loadUserContext(UserFileInfo userFileInfo) {
+        currentUser = userFileInfo;
+        currentVoca = new Voca(userFileInfo);
+        currentVocaWords = currentVoca.getVoca();
+        homeController.updateUserFileInfo(userFileInfo);
+        homeController.updateVocabulary(currentVocaWords);
+        statController.updateUserInfo(userFileInfo);
+        fileController.updateUserInfo(userFileInfo);
+        quizController.updateVocabulary(currentVocaWords);
+        incorrectManagement = new IncorrectManagement(userFileInfo);
+        quizController.setIncorrectManagement(incorrectManagement);
+        quizController.setIncorrectUpdateListener(incorrectController::refreshList);
+        quizController.setStatManagement(statController.getStatManager());
+        incorrectController.setIncorrectManagement(incorrectManagement);
+        FileManagement.saveVoca(currentVocaWords,userFileInfo.getVocaFilePath());
     }
 
     private void toggleCurrentMenu() {
@@ -171,6 +212,7 @@ public class MainController implements Controller {
             case CARD_QUIZ -> quizController.toggleMenu();
             case CARD_STAT -> statController.toggleMenu();
             case CARD_FILE -> fileController.toggleMenu();
+            case CARD_INCORRECT -> incorrectController.toggleMenu();
             default -> { }
         }
     }

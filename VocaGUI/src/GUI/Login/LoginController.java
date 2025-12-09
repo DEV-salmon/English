@@ -25,9 +25,9 @@ import java.util.Vector;
 public class LoginController implements Controller {
     private final LoginUI loginUI;
     private Controller signalHandler;
-    private static final String loginFilePath = "Voca/src/res/LoginList";
+    private static final String loginFilePath = "VocaGUI/res/Loginlist";
     private final LogInManagement logInManagement = new LogInManagement(loginFilePath);
-    private static final String USER_VOCA_DIR = "Voca/src/res/Vocas";
+    private static final String USER_VOCA_DIR = "VocaGUI/res/Vocas";
 
     public LoginController() {
         this(null);

@@ -12,7 +12,7 @@ import voca.management.*;
  * LoginManagement를 통해 UserFileInfo를 받아와 유저를 폴더별로 관리합니다
  */
 public class Voca extends BaseMenu {
-    private static final String DEFAULT_VOCA_PATH = "Voca/src/res/voca";
+    private static final String DEFAULT_VOCA_PATH = "VocaGUI/res/voca";
     private final Vector<Word> voca;
     private final Scanner scanner = new Scanner(System.in);
     private final String filePath;

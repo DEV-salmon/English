@@ -1,0 +1,13 @@
+symbolic	상징적인		SPELLING - SUBJECTIVE
+sociable	사교적인		SPELLING - SUBJECTIVE
+society	사회		SPELLING - SUBJECTIVE
+example	예시		SPELLING - SUBJECTIVE
+socialize	사회화하다		SPELLING - SUBJECTIVE
+consideration	고려, 생각		SPELLING - SUBJECTIVE
+intelligence	지식		SPELLING - SUBJECTIVE
+considering that	～을 고려하건대		SPELLING - SUBJECTIVE
+of late	최근에		SPELLING - SUBJECTIVE
+train	기차, 훈련시키다		SPELLING - SUBJECTIVE
+endowment	기부, 기증		SPELLING - SUBJECTIVE
+trainer	훈련자		SPELLING - SUBJECTIVE
+considering that	～을 고려하건대		ENG_KOR - SUBJECTIVE

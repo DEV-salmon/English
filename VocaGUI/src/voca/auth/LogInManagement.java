@@ -21,7 +21,7 @@ public class LogInManagement extends BaseMenu {
     private final Vector<Login> loginList;
     private static final Scanner scanner = new Scanner(System.in);
     private final String loginFilePath;
-    private static final String USER_VOCA_DIR = "Voca/src/res/Vocas";
+    private static final String USER_VOCA_DIR = "VocaGUI/res/Vocas";
 
     public LogInManagement(String fileName) {
         this.loginFilePath = fileName;
@@ -195,7 +195,7 @@ public class LogInManagement extends BaseMenu {
             parent.mkdirs();
         }
         if(!file.exists()){
-            Vector<Word> vocaBase = FileManagement.makeVoca("Voca/src/res/voca");
+            Vector<Word> vocaBase = FileManagement.makeVoca("VocaGUI/res/voca");
             FileManagement.saveVoca(new Vector<>(vocaBase), filePath);
         }
     }

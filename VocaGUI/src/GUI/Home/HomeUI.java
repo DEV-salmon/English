@@ -40,7 +40,7 @@ public class HomeUI extends JPanel {
 
         JButton menuBtn = sideMenu.getToggleButton();
         
-        searchField = new JTextField(" 입력하세요");
+        searchField = new JTextField("");
         searchField.setFont(new Font("맑은 고딕", Font.PLAIN, 16));
         MakePrettyInterface.setFixedSize(searchField, 400, 50);
         searchField.getDocument().addDocumentListener(new DocumentListener() {
@@ -154,11 +154,19 @@ public class HomeUI extends JPanel {
     }
 
     public Object[] showAddWordDialogue() {
+        return showAddWordDialogue(null);
+    }
+
+    public Object[] showAddWordDialogue(String defaultEng) {
         UIManager.put("OptionPane.background", Color.WHITE);
         UIManager.put("Panel.background", Color.WHITE);
         UIManager.put("Label.background", Color.WHITE);
 
         JTextField newWordENGField = new JTextField(20);
+        String initialEng = (defaultEng != null && !defaultEng.trim().isEmpty())
+                ? defaultEng.trim()
+                : getCurrentSearchText();
+        newWordENGField.setText(initialEng);
         JTextField newWordKORField = new JTextField(20);
         JTextField newWordEXField = new JTextField(20);
 

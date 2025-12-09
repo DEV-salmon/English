@@ -104,7 +104,7 @@ public class FileManagement {
     public static void saveVoca(Vector<Word> voca,String filename) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(filename))) {
             if(voca.isEmpty()){
-                Vector<Word> vocaBase = makeVoca("Voca/src/res/voca");
+                Vector<Word> vocaBase = makeVoca("VocaGUI/res/voca");
                 voca.addAll(vocaBase);
             }else{
                 for (Word word : voca) {

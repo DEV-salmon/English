@@ -159,13 +159,21 @@ public class QuizController implements Controller {
                 if (objectiveMode) options = buildOptionsEng(eng, pool, random);
                 quizType = QUIZ_TYPE_KOR_ENG + typeSuffix;
             } else if ("EX".equals(key)) {
-                String ex = w.getEx() == null ? "" : w.getEx();
-                prompt = ex.isEmpty() ? eng : ex.replace(eng, "_____");
+                String ex = w.getEx();
+                if (ex != null && !ex.trim().isEmpty()) {
+                    if (ex.contains(eng)) {
+                        prompt = ex.replace(eng, "_____");
+                    } else {
+                        prompt = ex + " (빈칸 단어: " + eng + ")";
+                    }
+                } else {
+                    prompt = "예문이 없습니다. 단어: " + eng;
+                }
                 answers.add(eng);
                 if (objectiveMode) options = buildOptionsEng(eng, pool, random);
                 quizType = QUIZ_TYPE_EXAMPLE + typeSuffix;
             } else if ("SPELLING".equals(key)) {
-                prompt = korJoined;
+                prompt = "🎧 들리는 단어의 스펠링을 입력하세요.";
                 answers.add(eng);
                 if (objectiveMode) options = buildOptionsEng(eng, pool, random);
                 quizType = QUIZ_TYPE_SPELLING + typeSuffix;

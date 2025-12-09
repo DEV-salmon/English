@@ -82,7 +82,8 @@ public class HomeController implements Controller {
     }
 
     private void handleAddWord(Object payload) {
-        Object[] inputData = homeUI.showAddWordDialogue();
+        String defaultEng = payload == null ? "" : payload.toString();
+        Object[] inputData = homeUI.showAddWordDialogue(defaultEng);
         handleAddWordJudgement(inputData);
     }
     private void handleAddWordJudgement(Object[] data) {

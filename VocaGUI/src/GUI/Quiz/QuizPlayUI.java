@@ -66,7 +66,11 @@ public class QuizPlayUI extends JPanel {
 
         listPanel.setLayout(new javax.swing.BoxLayout(listPanel, javax.swing.BoxLayout.Y_AXIS));
         MakePrettyInterface.makeWhite(listPanel);
-        JScrollPane scrollPane = new JScrollPane(listPanel);
+        JPanel listWrapper = new JPanel(new GridBagLayout());
+        MakePrettyInterface.makeWhite(listWrapper);
+        listWrapper.add(listPanel);
+
+        JScrollPane scrollPane = new JScrollPane(listWrapper);
         scrollPane.getVerticalScrollBar().setUnitIncrement(12);
         scrollPane.setBorder(new javax.swing.border.LineBorder(Color.LIGHT_GRAY, 1, true));
         MakePrettyInterface.setFixedSize(scrollPane, 560, 540);
@@ -198,8 +202,11 @@ public class QuizPlayUI extends JPanel {
             MakePrettyInterface.makeWhite(container);
             JLabel title = new JLabel(index + ". " + question.prompt);
             title.setFont(new Font("맑은 고딕", Font.BOLD, 14));
+            title.setAlignmentX(JComponent.LEFT_ALIGNMENT);
             container.add(title);
             container.setBorder(new javax.swing.border.LineBorder(Color.LIGHT_GRAY, 1, true));
+            MakePrettyInterface.makeShadow(container, false);
+            container.setMaximumSize(new java.awt.Dimension(520, Integer.MAX_VALUE));
             container.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         }
 
@@ -212,6 +219,36 @@ public class QuizPlayUI extends JPanel {
         }
 
         public abstract boolean isCorrect();
+
+        protected boolean isSpelling() {
+            return question != null && question.quizType != null && question.quizType.startsWith("SPELLING");
+        }
+
+        protected boolean isExample() {
+            return question != null && question.quizType != null && question.quizType.startsWith("EXAMPLE");
+        }
+
+        protected JButton createListenButton() {
+            JButton listenBtn = new JButton("듣기");
+            MakePrettyInterface.styleSecondaryButton(listenBtn);
+            MakePrettyInterface.setFixedSize(listenBtn, 80, 30);
+            listenBtn.addActionListener(e -> playAudio());
+            return listenBtn;
+        }
+
+        private void playAudio() {
+            if (question == null || question.sourceWord == null) {
+                return;
+            }
+            if (isExample()) {
+                String example = question.sourceWord.getEx();
+                if (example != null && !example.isEmpty()) {
+                    question.sourceWord.voiceEx();
+                }
+            } else {
+                question.sourceWord.voiceEng();
+            }
+        }
     }
 
     private static class SubjectiveRow extends QuestionRow {
@@ -220,8 +257,13 @@ public class QuizPlayUI extends JPanel {
         SubjectiveRow(int index, QuizQuestion question) {
             super(index, question);
             MakePrettyInterface.makeShadow(answerField, false);
-            JPanel answerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            JPanel answerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
             MakePrettyInterface.makeWhite(answerPanel);
+            answerPanel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+            if (isSpelling() || isExample()) {
+                JButton listenBtn = createListenButton();
+                answerPanel.add(listenBtn);
+            }
             answerPanel.add(answerField);
             container.add(MakePrettyInterface.spacer(0, 8));
             container.add(answerPanel);
@@ -248,6 +290,11 @@ public class QuizPlayUI extends JPanel {
             super(index, question);
             JPanel optionsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 4));
             MakePrettyInterface.makeWhite(optionsPanel);
+            optionsPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+            if (isSpelling() || isExample()) {
+                JButton listenBtn = createListenButton();
+                optionsPanel.add(listenBtn);
+            }
             if (question.options != null) {
                 for (String opt : question.options) {
                     JRadioButton btn = new JRadioButton(opt);

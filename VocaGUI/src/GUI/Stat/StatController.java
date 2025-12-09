@@ -1,7 +1,5 @@
 package GUI.Stat;
 
-import javax.swing.JOptionPane;
-
 import GUI.Main.GlobalSignal;
 import Signal.Controller;
 import Signal.Signal;
@@ -14,7 +12,6 @@ public class StatController implements Controller {
     private final Controller globalHandler;
     private StatManagement statManager;
     private boolean menuVisible;
-    private String selectedQuizType = "";
 
     public StatController(Controller globalHandler) {
         this(null, globalHandler);
@@ -44,25 +41,7 @@ public class StatController implements Controller {
             return;
         }
 
-        if (statManager == null) {
-            statUI.showMessage("로그인 후 통계 기능을 사용할 수 있습니다.");
-            return;
-        }
-
-        switch (statSignal) {
-            case STAT_SHOW_BUTTON:
-                handleSaveAction("통계 파일과 그래프를 갱신했습니다.");
-                break;
-            case STAT_SAVE_BUTTON:
-                handleSaveAction("통계를 저장했습니다.");
-                break;
-            case STAT_QUIZTYPE_SELECT:
-                selectedQuizType = option == null ? "" : option.toString();
-                statUI.updateSummary(buildSummaryText("선택된 퀴즈 유형을 업데이트했습니다."));
-                break;
-            default:
-                break;
-        }
+        refreshView();
     }
 
     public void updateUserInfo(UserFileInfo userInfo) {
@@ -83,19 +62,25 @@ public class StatController implements Controller {
         statUI.setSideMenuVisible(menuVisible);
     }
 
-    private void handleSaveAction(String message) {
+    /**
+     * Stat 화면이 열릴 때 자동으로 통계와 그래프를 갱신합니다.
+     */
+    public void refreshView() {
+        if (statManager == null) {
+            statUI.updateSummary("로그인 후 통계를 볼 수 있습니다.");
+            statUI.updateChart(null);
+            return;
+        }
         statManager.saveStatToFile();
-        statUI.updateSummary(buildSummaryText(message));
-        JOptionPane.showMessageDialog(statUI, message);
+        statUI.updateSummary(buildSummaryText());
+        statUI.updateChart(statManager.getChartFilePath());
+        statUI.showSummaryCard();
     }
 
-    private String buildSummaryText(String action) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("최근 작업: ").append(action);
-        if (selectedQuizType != null && !selectedQuizType.isEmpty()) {
-            builder.append("\n선택된 퀴즈 유형: ").append(selectedQuizType);
+    private String buildSummaryText() {
+        if (statManager == null) {
+            return "로그인 후 통계를 볼 수 있습니다.";
         }
-        builder.append("\n저장 위치: ").append(statManager == null ? "알 수 없음" : statManager.getStatFilePath());
-        return builder.toString();
+        return statManager.buildSummaryForUi();
     }
 }
