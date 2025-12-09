@@ -28,3 +28,4 @@ train	기차, 훈련시키다
 trainer	훈련자	
 universal	우주의, 일반적인	
 example	예시	
+apple	사과	He ate apple

@@ -164,8 +164,7 @@ public class HomeUI extends JPanel {
 
         JTextField newWordENGField = new JTextField(20);
         String initialEng = (defaultEng != null && !defaultEng.trim().isEmpty())
-                ? defaultEng.trim()
-                : getCurrentSearchText();
+                ? defaultEng.trim() : getCurrentSearchText();
         newWordENGField.setText(initialEng);
         JTextField newWordKORField = new JTextField(20);
         JTextField newWordEXField = new JTextField(20);
@@ -475,6 +474,11 @@ public class HomeUI extends JPanel {
 
         return new Object[]{resultState[0],data};
 
+    }
+
+    private String getCurrentSearchText() {
+        String text = searchField.getText();
+        return text == null ? "" : text.trim();
     }
 
     // 홈 화면을 확인하기 위한 테스트 메인

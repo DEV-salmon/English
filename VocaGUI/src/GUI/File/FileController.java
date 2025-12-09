@@ -48,13 +48,13 @@ public class FileController implements Controller {
 
         switch (fileSignal) {
             case FILE_MERGE:
-                handleFileMerge(data);
+                handleFileMerge();
                 break;
             case FILE_LOAD:
-                handleFileLoad(data);
+                handleFileLoad();
                 break;
             case FILE_SAVE:
-                handleFileSave(data);
+                fileUI.showMessage("파일은 자동으로 저장됩니다.");
                 break;
             default:
                 break;
@@ -70,50 +70,33 @@ public class FileController implements Controller {
     // 💡 CORE HANDLERS
     // ====================================================================
 
-    private void handleFileMerge(Object data) {
+    private void handleFileMerge() {
         boolean mergeCompleted = false;
         String currentPath = "";
 
         while (!mergeCompleted) {
-            Object[] InputData = fileUI.showFileMergeDialogue(currentPath);
-            JTextField newFileField = (JTextField) InputData[0];
-            JTextField newPolicyField = (JTextField) InputData[1];
-            int result = (int)InputData[2];
+            FileUI.FileMergeDialogResult result = fileUI.showFileMergeDialogue(currentPath);
+            if(result.getResult() != JOptionPane.OK_OPTION){
+                break;
+            }
 
-            if(result == JOptionPane.NO_OPTION){
-                File str = fileUI.showFileChooser();
-                if (str != null) {
-                    currentPath = str.getAbsolutePath();
-                    newFileField.setText(str.getAbsolutePath());
-                }
+            currentPath = result.getPath().trim(); // 최종 경로 업데이트
+            if (currentPath.isEmpty()) {
+                fileUI.showMessage("파일 경로를 선택하세요.");
                 continue;
             }
 
-            // 2. 병합 실행 (OK_OPTION)
-            if(result == JOptionPane.OK_OPTION){
-                currentPath = newFileField.getText().trim(); // 최종 경로 업데이트
-                String policy = newPolicyField.getText();
-                executeMergeLogic(currentPath, policy);
-                mergeCompleted = true;
-            }
-
-            // 3. 취소 (CANCEL_OPTION)
-            if(result == JOptionPane.CANCEL_OPTION || result == JOptionPane.CLOSED_OPTION){
-                // CANCEL이 눌렸으므로 루프를 종료합니다.
-                mergeCompleted = true;
-            }
+            executeMergeLogic(currentPath);
+            mergeCompleted = true;
         }
     }
 
-    private void executeMergeLogic(String path, String policyStr) {
-        String policy = policyStr;
-
+    private void executeMergeLogic(String path) {
         if(!validateVocaFormat(path)){
             fileUI.showMessage("파일 내용이 정확하지 않음");
             return;
         }
 
-        // 이전에 구현했던 병합 로직을 그대로 여기에 배치합니다.
         String backupPath = createBackup();
         Vector<Word> loaded = FileManagement.makeVoca(path);
 
@@ -122,33 +105,47 @@ public class FileController implements Controller {
             return;
         }
 
-        String intPolicy;
-        try {
-            intPolicy = policy;
-        } catch (NumberFormatException e) {
-            fileUI.showMessage("정책 번호는 숫자로 입력해야 합니다.");
-            return;
-        }
-
-        int[] resulted = applyMergePolicy(loaded, intPolicy);
+        int[] resulted = applyMergePolicy(loaded);
 
         System.out.println("합치기를 완료했습니다. 추가:" + resulted[0] + " 갱신:" + resulted[1] + " 건너뜀:" + resulted[2] + " / 총 단어 수 : " + vocabulary.size());
-        FileManagement.saveVoca(vocabulary,userFileInfo.getVocaFilePath());
-        globalHandler.send(GlobalSignal.UPDATE_VOCA,vocabulary);
+        saveIfPossible();
+        if(globalHandler != null){
+            globalHandler.send(GlobalSignal.UPDATE_VOCA,vocabulary);
+        }
 
         if(!backupPath.isEmpty()){
             System.out.println("문제가 생기면 백업 파일로 복원하세요 : " + backupPath);
         }
-        // UI 업데이트 시그널 전송 (globalHandler.send(GlobalSignal.UPDATE_VOCA, vocabulary);)도 추가해야 합니다.
     }
 
 
-    private void handleFileLoad(Object data) {
+    private void handleFileLoad() {
+        File selectedFile = fileUI.showFileChooser();
+        if (selectedFile == null) {
+            return;
+        }
+        String path = selectedFile.getAbsolutePath();
 
-    }
+        if(!validateVocaFormat(path)){
+            return;
+        }
+        String backupPath = createBackup();
+        Vector<Word> loaded = FileManagement.makeVoca(path);
+        if(loaded.isEmpty()){
+            fileUI.showMessage("불러올 단어가 없습니다.");
+            return;
+        }
 
-    private void handleFileSave(Object data) {
-
+        vocabulary.clear();
+        vocabulary.addAll(loaded);
+        saveIfPossible();
+        if(globalHandler != null){
+            globalHandler.send(GlobalSignal.UPDATE_VOCA, vocabulary);
+        }
+        if(!backupPath.isEmpty()){
+            System.out.println("문제가 생기면 백업 파일로 복원하세요 : " + backupPath);
+        }
+        fileUI.showMessage("파일을 불러왔습니다.");
     }
 
     // ====================================================================
@@ -180,6 +177,9 @@ public class FileController implements Controller {
      * 현재 단어장 파일을 백업합니다.
      */
     public String createBackup(){
+        if (userFileInfo == null) {
+            return "";
+        }
         try{
             File source = new File(userFileInfo.getVocaFilePath());
             if(!source.exists()){
@@ -227,7 +227,7 @@ public class FileController implements Controller {
     /**
      * 병합 정책을 적용하고 결과를 반환합니다.
      */
-    private int[] applyMergePolicy(Vector<Word> loaded, String policy){
+    private int[] applyMergePolicy(Vector<Word> loaded){
         int added = 0;
         int updated = 0;
         int skipped = 0;
@@ -244,37 +244,9 @@ public class FileController implements Controller {
                 added++;
                 continue;
             }
-            if(policy == "1"){
-                skipped++;
-            }
-            else if(policy == "2"){
-                vocabulary.set(idx, word);
-                updated++;
-            }
-            else if(policy == "3"){
-                Word current = vocabulary.get(idx);
-                mergeWordContent(current, word);
-                updated++;
-            }
+            skipped++;
         }
         return new int[]{added, updated, skipped};
-    }
-
-    /**
-     * 단어장을 병합할 때 기존과 새 데이터를 합칩니다.
-     */
-    private void mergeWordContent(Word base, Word incoming){
-        Set<String> korSet = new HashSet<>();
-        for(String kor : base.getKor()){
-            korSet.add(kor.trim());
-        }
-        for(String kor : incoming.getKor()){
-            korSet.add(kor.trim());
-        }
-        base.setKor(korSet.toArray(new String[0]));
-        if((base.getEx() == null || base.getEx().isEmpty()) && incoming.getEx() != null && !incoming.getEx().isEmpty()){
-            base.setEx(incoming.getEx());
-        }
     }
 
     /**
@@ -322,12 +294,20 @@ public class FileController implements Controller {
         }
     }
 
+    private void saveIfPossible() {
+        if (userFileInfo == null) {
+            System.err.println("경고: 저장 경로가 없어 변경사항을 파일에 반영하지 못했습니다.");
+            fileUI.showMessage("저장 경로가 없어 파일로 저장하지 못했습니다.");
+            return;
+        }
+        FileManagement.saveVoca(vocabulary, userFileInfo.getVocaFilePath());
+    }
+
     public void updateUserInfo(UserFileInfo newUserFileInfo) {
         this.userFileInfo = newUserFileInfo;
     }
 
     public UserFileInfo getUserFileInfo() {
-        return userFileInfo = userFileInfo;
+        return userFileInfo;
     }
 }
-

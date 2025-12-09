@@ -1,6 +1,5 @@
 package GUI.File;
 
-import GUI.Home.HomeController;
 import GUI.Main.SideMenu;
 import Signal.Controller;
 import Test.ExampleVector;
@@ -17,7 +16,6 @@ public class FileUI extends JPanel {
     private final JLabel fileText;
     private final JButton fileMerge;
     private final JButton fileLoad;
-    private final JButton fileSave;
     private Font btnFont = new Font("맑은 고딕",Font.BOLD,12);
 
     public FileUI(Controller signalHandler) {
@@ -32,7 +30,7 @@ public class FileUI extends JPanel {
         JPanel contentPanel = new JPanel(new BorderLayout());
         MakePrettyInterface.makeWhite(contentPanel);
 
-        JPanel btns = new JPanel(new GridLayout(3,1,50,50));
+        JPanel btns = new JPanel(new GridLayout(2,1,50,50));
         MakePrettyInterface.makeWhite(btns);
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         topPanel.setBorder(new LineBorder(Color.BLACK,1, true));
@@ -61,9 +59,6 @@ public class FileUI extends JPanel {
         fileLoad = new JButton("파일 불러오기");
         btnSetting(fileLoad);
         fileLoad.addActionListener(e -> signalHandler.send(FileSignal.FILE_LOAD, null));
-        fileSave = new JButton("파일 저장하기");
-        btnSetting(fileSave);
-        fileSave.addActionListener(e -> signalHandler.send(FileSignal.FILE_SAVE, null));
 
 
         add(sideMenu, BorderLayout.WEST);
@@ -81,7 +76,6 @@ public class FileUI extends JPanel {
         centerPanel.add(btns);
         btns.add(fileMerge);
         btns.add(fileLoad);
-        btns.add(fileSave);
 
     }
 
@@ -101,7 +95,7 @@ public class FileUI extends JPanel {
         MakePrettyInterface.updateScreen(this);
     }
 
-    public Object[] showFileMergeDialogue(String currentPath) {
+    public FileMergeDialogResult showFileMergeDialogue(String currentPath) {
         UIManager.put("OptionPane.background", Color.WHITE);
         UIManager.put("Panel.background", Color.WHITE);
         UIManager.put("Label.background", Color.WHITE);
@@ -132,25 +126,18 @@ public class FileUI extends JPanel {
         JButton btnFile = new JButton("파일 찾기");
         MakePrettyInterface.setFixedSize(btnFile, 50, 20);
         btnFile.setFont(new Font("맑은 고딕", Font.BOLD, 12));
+        btnFile.setBackground(Color.WHITE);
+        btnFile.setFocusPainted(false);
+        MakePrettyInterface.makeShadow(btnFile, false);
         PathFlow.add(PathText);
         PathFlow.add(newFileField);
         PathFlow.add(btnFile);
 
-        JLabel PolicyText = new JLabel("정책");
+        JLabel PolicyText = new JLabel("중복 단어는 자동으로 건너뜁니다.");
         PolicyText.setFont(new Font("맑은 고딕", Font.BOLD, 12));
-        JTextField newPolicyField = new JTextField(20);
-        newPolicyField.setText("숫자만 입력하세요");
         JPanel PolicyFlow = new JPanel(new FlowLayout(FlowLayout.CENTER));
         MakePrettyInterface.makeWhite(PolicyFlow);
-        MakePrettyInterface.makeShadow(newPolicyField, false);
         PolicyFlow.add(PolicyText);
-        PolicyFlow.add(newPolicyField);
-
-        JLabel PolicyInfoText = new JLabel("1) 중복은 건너뛰기 2) 새 파일 값으로 덮어쓰기 3) 뜻/예문을 합치기");
-        PolicyInfoText.setFont(new Font("맑은 고딕", Font.BOLD, 12));
-        JPanel PolicyInfoFlow = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        MakePrettyInterface.makeWhite(PolicyInfoFlow);
-        PolicyInfoFlow.add(PolicyInfoText);
 
 
         JButton btnMerge = new JButton("병합");
@@ -178,8 +165,6 @@ public class FileUI extends JPanel {
         addWordPanel.add(Box.createVerticalStrut(10));
         addWordPanel.add(PolicyFlow);
         addWordPanel.add(Box.createVerticalStrut(10));
-        addWordPanel.add(PolicyInfoFlow);
-        addWordPanel.add(Box.createVerticalStrut(10));
         addWordPanel.add(buttonPanel);
 
         final int[] resultState = {JOptionPane.CANCEL_OPTION};
@@ -197,9 +182,10 @@ public class FileUI extends JPanel {
         });
 
         btnFile.addActionListener(e -> {
-            resultState[0] = JOptionPane.NO_OPTION;
-            Window w = SwingUtilities.getWindowAncestor(btnFile);
-            if (w != null) w.dispose();
+            File chosen = showFileChooser();
+            if (chosen != null) {
+                newFileField.setText(chosen.getAbsolutePath());
+            }
         });
 
         JOptionPane.showOptionDialog(
@@ -213,7 +199,7 @@ public class FileUI extends JPanel {
                 null
         );
 
-        return new Object[]{newFileField,newPolicyField, resultState[0]};
+        return new FileMergeDialogResult(newFileField.getText(), resultState[0]);
     }
 
     public File showFileChooser(){
@@ -232,6 +218,24 @@ public class FileUI extends JPanel {
 
     public void showMessage(String message) {
         JOptionPane.showMessageDialog(this, message);
+    }
+
+    public static class FileMergeDialogResult {
+        private final String path;
+        private final int result;
+
+        public FileMergeDialogResult(String path, int result) {
+            this.path = path;
+            this.result = result;
+        }
+
+        public String getPath() {
+            return path;
+        }
+
+        public int getResult() {
+            return result;
+        }
     }
 
     public static void main(String[] args) {
